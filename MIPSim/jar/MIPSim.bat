@@ -1,0 +1,2 @@
+@echo off
+java --module-path "C:\javafx-sdk-22.0.1\lib";"C:\javafx-sdk-22.0.1\lib\controlsfx-11.2.1.jar" --add-modules javafx.controls,javafx.fxml,org.controlsfx.controls -cp "C:\javafx-sdk-22.0.1\lib\jmetro-11.6.16.jar" -jar MIPSim.jar
