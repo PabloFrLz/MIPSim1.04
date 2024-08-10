@@ -1,0 +1,40 @@
+
+
+NOTAS VER. 1.03:
+
+    1 - Imagens modificadas para aumentar a fonte de texto da UC, Registradores não arquiteturais e multiplexadores. Inserida também a descrição dos Registradores 
+        Não arquiteturais, exceto para o A/B pois não tinha espaço. Não deu pra aumentar a Fonte da "FlagZero" e "ALUResult" pois não sobraria espaço.
+
+    2 - Remoção da 'Circuit view' e do Menu "Appearance".
+
+    3 - Modificado de "Values in Modules" para "Show Details". 
+
+    4 - Não foi aumentado a Fonte dos textos, mas foi criado um Slider em "Settings -> Font size", que vai aumentar a font do tamanho 8 ao 16.
+
+    5 - Adicionado a descrição "Simulation speed" ao Slide que controla a velocidade da energia nos terminais.
+
+    6 - Deslocado "Memory -> set number of bytes printed" dentro do Menu "Settings".
+
+    7 - Adicionado bloqueio ao botão stop enquanto houver estado em execução.
+
+    8 - ...
+
+    9 - Adicionado a descrição "3   2   1   0     Address" nos segmentos de memória para destacar a posição dos bytes e endereço.
+
+    10 - Adicionado Tooltips para quando o usuario passar o mouse em cima dos botões de clock e de parar, e manter o mouse em cima por 2 segundos, 
+        surgirá uma descrição informando ser um "Clock Button" e um "Stop Button".
+
+    11 - Modificado a imagem do botão "Play" do botão de clock e adicionado uma imagem com um pulso de clock no lugar, para representar melhor a ação.
+
+    12 - Reinserido o Menu "Appearance" dentro do Menu "Settings", com dois temas adicionados:
+            • Neon view - Moldura verde neon pulsando (animação) para destacar segmentos de memoria, e demais textos em verde limão;
+            • Golden view - Moldura ornamentada dourada para destacar segmentos de memorias (sem animação), e demais textos em amarelo dourado".
+    
+    13 - Inserido destaque para a instrução em execução no segmento de memoria TEXT. Agora, fica com um fundo diferente das demais instruções.
+
+    14 - Invertido a disposição dos itens de memoria de "3 2 1 0  Address"  para  "Address  0 1 2 3".
+
+    15 - Alterado a animação textual padrão "Fade Text Animation" para "Scale Text Animation", para auxiliar portadores de miopia. 
+
+    16 - Modificado o timing do fundo verde que simboliza o pulso de clock dos modulos internos do MIPS. Agora o fundo verde permanece ativo (rising_edge)
+         até que o estado atual termine (falling_edge). 

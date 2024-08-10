@@ -1,0 +1,174 @@
+.button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-size: cover, cover;
+    -fx-background-repeat: no-repeat, no-repeat;
+    -fx-background-position: center, center;
+    -fx-padding: 0; 
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-focus-color: transparent; 
+    -fx-faint-focus-color: transparent; 
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+/* mantem a aparência original quando o botão estiver desativado */
+.button:disabled {
+    -fx-opacity: 1; 
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-size: cover, cover;
+    -fx-background-repeat: no-repeat, no-repeat;
+    -fx-background-position: center, center;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+.button-3 {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-size: cover, cover;
+    -fx-background-repeat: no-repeat, no-repeat;
+    -fx-background-position: center, center;
+    -fx-padding: 0; 
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-focus-color: transparent; 
+    -fx-faint-focus-color: transparent; 
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+.button-3:pressed {
+    -fx-background-image: url('file:recursos/img-back-btn-pressed.png');
+}
+
+/* Estilo para TextField */
+.text-area-custom {
+    -fx-border-color: rgb(0, 0, 0); /* Cor da borda */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5); /* Sombra */
+    -fx-font-family: 'Consolas';
+    -fx-font-size: 12pt;
+}
+
+/* Estilo para ListView */
+.list-view-custom {
+    -fx-font-family: 'Consolas';
+    -fx-font-size: 9pt;
+    -fx-background-radius: 10; /* Bordas arredondadas */
+    -fx-border-radius: 10; /* Bordas arredondadas */
+    -fx-border-color: gray; /* Cor da borda */
+    -fx-border-width: 1; /* Largura da borda */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5); /* Sombra */
+    -fx-opacity: 0.2; /* Opacidade */
+}
+
+.list-view-custom .list-cell {
+    -fx-text-fill: WHITE; /* Cor do texto dos itens */
+}
+
+.list-view-custom .scroll-bar {
+    -fx-background-color: transparent; /* Torna o fundo da barra transparente */
+}
+
+.list-view-custom .scroll-bar:vertical {
+    -fx-background-radius: 10; /* Bordas arredondadas */
+    -fx-pref-width: 10px; /* Largura preferida da barra de rolagem vertical */
+}
+
+.list-view-custom .scroll-bar:horizontal {
+    -fx-background-radius: 10; /* Bordas arredondadas */
+    -fx-pref-height: 10px; /* Altura preferida da barra de rolagem horizontal */
+}
+
+.list-view-custom .scroll-bar .thumb {
+    -fx-background-radius: 10; /* Bordas arredondadas da "thumb" */
+    -fx-background-color: rgba(128, 128, 128, 0.5); /* Cor da "thumb" */
+}
+
+
+.label-custom {
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 1, 5); /* Sombra */
+    -fx-opacity: 0.8; /* Opacidade */
+}
+
+.image-view-custom {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 5, 5); /* Sombra */
+    -fx-opacity: 0.8; /* Opacidade */
+}
+
+.image-view-custom-2 {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, -6, 5); /* Sombra */
+    -fx-opacity: 0.8; /* Opacidade */
+}
+
+
+
+.label-text-background {
+    -fx-border-radius: 20; /* Bordas arredondadas */
+    -fx-background-color: rgba(51, 51, 51, 1.0);
+    -fx-background-radius: 20; /* Bordas arredondadas */
+    -fx-border-width: 1; /* Largura da borda */
+    -fx-border-color: gray; /* Cor da borda */
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.75), 20, 0.0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+    -fx-opacity: 0.4; /* Opacidade */
+}
+
+.text-normal {
+    -fx-font-weight: normal;
+    -fx-effect: null;
+    -fx-stroke: none;
+    -fx-font-family: 'Lucida Console';
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+.text-normal-2 {
+    -fx-stroke: none;  
+    -fx-fill: gray;  
+    -fx-font-family: 'Inria Sans';
+    -fx-font-weight: lighter;  
+}
+
+
+.text-box-registers {
+    -fx-stroke: none;  
+    -fx-fill: rgb(255, 215, 0); 
+    -fx-font-family: 'Inria Sans';
+    -fx-font-weight: lighter;  
+}
+
+.button-2 {
+    -fx-background-color: BLACK;
+    -fx-background-radius: 0;
+    -fx-padding: 0; 
+    -fx-text-fill: WHITE; 
+    -fx-border-color: gray;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+.button-2:hover {
+    -fx-background-color: gray;
+    -fx-text-fill: white;
+}
+
+
+.text-appearance-1 {
+    -fx-stroke: rgb(255, 215, 0);  
+    -fx-fill: rgb(255, 215, 0); 
+    -fx-font-family: 'Inria Sans';
+    -fx-font-weight: lighter;  
+}
+
+.text-appearance-2 {
+    -fx-stroke: limegreen;  
+    -fx-fill: limegreen; 
+    -fx-font-family: 'Inria Sans';
+    -fx-font-weight: lighter;  
+}
+

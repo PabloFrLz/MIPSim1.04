@@ -1,0 +1,8 @@
+NOTAS VER. 1.04:
+
+    1 - Suporte para a instrução xor do tipo-R.
+
+    2 - Inserção de comentários para auxiliar desenvolvedores que pretendam modificar o codigo para aumentar o conjunto de instruções 
+        suportadas pelo software do simulador.
+
+    3 - Simplificação dos codigos da ULA e UC.
