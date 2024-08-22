@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>console</headerType>
+  <jar>C:\Users\pablo\OneDrive\Documentos\UFMT\TC2\MIPSim\jar\MIPSim.jar</jar>
+  <outfile>C:\Users\pablo\OneDrive\Documentos\UFMT\TC2\MIPSim\exe\MIPSim.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine>--module-path &quot;C:\javafx-sdk-22.0.1\lib&quot;;&quot;C:\javafx-sdk-22.0.1\lib\controlsfx-11.2.1.jar&quot; --add-modules javafx.controls,javafx.fxml,org.controlsfx.controls -cp &quot;C:\javafx-sdk-22.0.1\lib\jmetro-11.6.16.jar&quot;</cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\pablo\OneDrive\Documentos\UFMT\TC2\Simulador1-04\recursos\logo0.ico</icon>
+  <classPath>
+    <mainClass>org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader</mainClass>
+    <cp>C:\javafx-sdk-22.0.1\lib\javafx.base.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\javafx.controls.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\javafx.fxml.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\javafx.graphics.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\javafx.media.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\javafx.swing.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\javafx.web.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\javafx-swt.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\controlsfx-11.2.1.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\jmetro-11.6.16.jar</cp>
+    <cp>C:\javafx-sdk-22.0.1\lib\jmetro-11.6.16-javadoc.jar</cp>
+  </classPath>
+  <jre>
+    <path>%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+    <opt>--module-path &quot;C:\javafx-sdk-22.0.1\lib&quot;;&quot;C:\javafx-sdk-22.0.1\lib\controlsfx-11.2.1.jar&quot; --add-modules javafx.controls,javafx.fxml,org.controlsfx.controls -cp &quot;C:\javafx-sdk-22.0.1\lib\jmetro-11.6.16.jar&quot;</opt>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.04.00.00</fileVersion>
+    <txtFileVersion>1.04.rc1</txtFileVersion>
+    <fileDescription>MIPSim - a multi-cycle processor simulator</fileDescription>
+    <copyright>© 2024 UFMT. All rights reserved.</copyright>
+    <productVersion>1.04.00.00</productVersion>
+    <txtProductVersion>1.04.rc1</txtProductVersion>
+    <productName>MIPSim</productName>
+    <companyName>UFMT</companyName>
+    <internalName>MIPSim simulator</internalName>
+    <originalFilename>MIPSim.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
+</launch4jConfig>
