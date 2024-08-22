@@ -9,9 +9,10 @@ import GUI.BarraLateral;
 import GUI.Main;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.control.Alert.AlertType;
 
 public class Memory implements ClockListener{
-    protected byte[] enderecamento;
+    public byte[] enderecamento;
     protected int A;
     protected short WE;
     protected int WD;
@@ -144,8 +145,6 @@ public class Memory implements ClockListener{
         }
         
         public String decodifica_instrucao_em_bin(String inst_asm){ //não confundir com o modulo de decodificação que está ou será criado no RegisterFile.java e na UC.java
-            
-
             //Tipo_R
             String op;
             String rs;
@@ -290,14 +289,16 @@ public class Memory implements ClockListener{
                 return op+Addr; //campos de uma instrução tipo-J em ordem
 
             }else{
-                throw new IllegalArgumentException("[Memory.java]: decodifica_instrucao_em_bin() - ERRO: O Simulador não dá suporte à instrução inserida ou não há instrução - "+operacao);
+                Main.showAlert(AlertType.WARNING, "Warning Dialog", "Instruction not supported", "The '"+operacao+"' instruction is not supported by the simulator.");
+                return null; //codigo de erro.
+                //throw new IllegalArgumentException("[Memory.java]: decodifica_instrucao_em_bin() - ERRO: O Simulador não dá suporte à instrução inserida ou não há instrução - "+operacao);
             }
 
 
 
         }
         
-        public void carrega_instrucoes_na_memoria(String codigo_asm){
+        public int carrega_instrucoes_na_memoria(String codigo_asm){
             int endereco_inicial = Memory.this.endereco_inicial_TEXT; 
             try (BufferedReader br = new BufferedReader(new FileReader(codigo_asm))) {
                 String inst;
@@ -307,6 +308,7 @@ public class Memory implements ClockListener{
                 while ((inst = br.readLine()) != null) { //vai lendo cada linha do codigo em assembly MIPS
                     if(endereco_inicial <= Memory.this.endereco_final_TEXT){
                         decode_inst = decodifica_instrucao_em_bin(inst); // decode_inst terá a instrução decodificada em binario, e.g., "00000010000100010100000000100000".
+                        if (decode_inst == null) { return 1;} // 1 indica erro.
                         instructionMap.put(decode_inst, inst); //salva em um HashMap para consultar a instrução atual posteriormente em convertDecimalInstructionToBin().
                         Bytes = convertBinToByte(decode_inst);
                         // insere o codigo em assemlby MIPS decodificado na posição 0x00001FFA em diante.
@@ -326,6 +328,7 @@ public class Memory implements ClockListener{
             } catch (IOException e) {
                 System.err.println("[Memory.java]: InstructionMemory - carrega_instrucoes_na_memoria() - ERRO: Erro ao ler o arquivo: ");
             }
+            return 0;
         }
     }
     
@@ -409,7 +412,7 @@ public class Memory implements ClockListener{
     
     
     
-    public int getRD_Word(){ // obtem uma palavra na saída RD - pode ser usado para obter a instrução ou dados.
+    /*public int getRD_Word(){ // obtem uma palavra na saída RD - pode ser usado para obter a instrução ou dados.
         if(this.unit_control.instr.equals("lw") && this.unit_control.state_UC.equals("S3")){ //verifica se é a instrução lw e se esta no estado S3 - verificação necessaria para evitar uns problemas
             this.A += endereco_inicial_DYNAMIC_DATA; //(SignImm + reg) + endereço de inicio do segmento DYNAMIC DATA 
             if(this.A > endereco_final_DYNAMIC_DATA){
@@ -425,15 +428,51 @@ public class Memory implements ClockListener{
             // operação logica "& 0xFF" adicionada para evitar problemas ao ler valores com bit MSB=1, o java interpretava como negativo, e um valor 'ff' (255) por exemplo, se tornava 'ffffffff' (-1).
         }
         
-        byte[] b = new byte[4];
         //lê a palavra
+        byte[] b = new byte[4];
         b[0] = Memory.this.enderecamento[Memory.this.A];
         b[1] = Memory.this.enderecamento[Memory.this.A+1];
         b[2] = Memory.this.enderecamento[Memory.this.A+2];
         b[3] = Memory.this.enderecamento[Memory.this.A+3];
         
-        int word_int = convertByteToDecimal(b);
-        return word_int; //retorna uma palavra no formato int
+        return convertByteToDecimal(b); //retorna uma palavra no formato int
+    }*/
+
+    public int getRD_Word() {
+        // Verifica se a instrução é "lw" ou "lb" e se está no estado S3
+        if (this.unit_control.state_UC.equals("S3") && 
+            (this.unit_control.instr.equals("lw") || this.unit_control.instr.equals("lb"))) {
+    
+            //this.A += endereco_inicial_DYNAMIC_DATA; // Ajusta o endereço com base no início do segmento DYNAMIC DATA (offset + reg_base + endereco_inicial_DYNAMIC_DATA) - descontinuado na versão 1.04
+    
+            // Verifica se o endereço está dentro dos limites do segmento DYNAMIC DATA
+            if (this.A > endereco_final_DYNAMIC_DATA) {
+                //throw new IllegalArgumentException("[Memory.java]: getRD_Word() - ERRO: Endereço de memória excedeu o endereço limite do segmento DYNAMIC DATA - " + this.A);
+                Main.showAlert(AlertType.WARNING, "Warning Dialog", "Memory address exceeded", "Memory address exceeded the address limit for the dynamic data segment. Reserved segments have not been implemented graphically and the values ​​will not be visible.");
+                System.out.println("[Memory.java]: getRD_Word() - WARNING: Endereço de memória excedeu o endereço limite do segmento DYNAMIC DATA - " + this.A);
+            }else if(this.A < endereco_inicial_TEXT){
+                Main.showAlert(AlertType.WARNING, "Warning Dialog", "Memory address exceeded", "Memory address is less than the starting address of the text segment. Reserved segments have not been implemented graphically and the values ​​will not be visible.");
+                System.out.println("[Memory.java]: getRD_Word() - WARNING: Endereço de memória é inferior ao endereço inicial do segmento TEXT - " + this.A);
+            } 
+            // Normalmente as instruções LW, LB, SW, SB podem acessar todos os segmentos de memoria, inclusive os reservados (RESERVED segment).
+            // Como os segmentos RESERVED não foram implementados graficamente nesse trabalho, apenas internamente, seria inadequado permitir escrita
+            // em um endereço que não seria mostrado na interface gráfica para consulta. Portanto, as areas permitidas para o software na versão 1.04
+            // será as areas entre o endereço do byte inicial do Segmento de TEXTO e o endereço do byte final do segmento DYNAMIC DATA. 
+    
+            // Se a instrução for "lb", retorna o byte lido
+            if (this.unit_control.instr.equals("lb")) {
+                return Memory.this.enderecamento[Memory.this.A] & 0xFF;
+            }
+        }
+    
+        // Para instruções "lw" e outras, lê a palavra (4 bytes)
+        byte[] b = new byte[4];
+        b[0] = Memory.this.enderecamento[Memory.this.A];
+        b[1] = Memory.this.enderecamento[Memory.this.A + 1];
+        b[2] = Memory.this.enderecamento[Memory.this.A + 2];
+        b[3] = Memory.this.enderecamento[Memory.this.A + 3];
+    
+        return convertByteToDecimal(b); // Retorna a palavra no formato int
     }
     
     
@@ -445,7 +484,6 @@ public class Memory implements ClockListener{
         if(this.unit_control.instr.equals("sb")){ // sb
             Memory.this.enderecamento[Memory.this.A] = b[3]; //salva o byte - o byte sempre vai estar mais à direita na palavra, que no caso é o b[3]
             //int pos_byte = Memory.this.A % 4; // obtem a posição do byte na palavra
-            insertAdressOnBar("Dynamic"); //manda a diferença da posição do byte com o endereço do byte, para enviar o endereço do primeiro byte da palavra. 
 
         } else{ // sw
             //salva os 4 bytes da palavra
@@ -453,9 +491,12 @@ public class Memory implements ClockListener{
             Memory.this.enderecamento[Memory.this.A+1] = b[1];
             Memory.this.enderecamento[Memory.this.A+2] = b[2];
             Memory.this.enderecamento[Memory.this.A+3] = b[3];
-            insertAdressOnBar("Dynamic"); //insere no segmento de memoria na interface grafica
         }
         
+        //atualiza os segmentos.
+        insertAdressOnBar("Dynamic"); 
+        insertAdressOnBar("Global"); 
+        //insertAdressOnBar("Text"); //não atualiza o segmento text porque suponho que o usuário não vá tentar salvar nesse segmento.
     }
     
     public void setA(int A){ this.A = A;}
@@ -470,12 +511,9 @@ public class Memory implements ClockListener{
     public void clock() {
         this.WE = this.unit_control.getMemWrite(); // WE = MemWrite
         if(this.WE == 1){ // *** [AVISO]: Trecho especifico da Memoria de dados - segmento Dynamic Data
-            // Para a instrução SW, a porta de endereçamento "A" já teria o valor do imediato somado ao valor do registrador nesta etapa, portanto,
-            // basta somar o valor em A com o valor do endereço inicial do segmento DYNAMIC DATA.
-            this.A += endereco_inicial_DYNAMIC_DATA; 
-            if(this.A <= endereco_final_DYNAMIC_DATA){
-                WriteData(); //escreve no segmento de memoria Dynamic Data
-
+            // this.A += endereco_inicial_DYNAMIC_DATA; 
+            if(this.A <= endereco_final_DYNAMIC_DATA && this.A >= endereco_inicial_TEXT){
+                WriteData(); //escreve no segmento de memoria escolhido entre DYNAMIC, GLOBAL e TEXT. Segmento RESERVED não é permitido escrita para esta versão do simulador. 
             }else{
                 throw new IllegalArgumentException("[Memory.java]: clock() - ERRO: Endereço de memória excedeu o endereço limite do segmento DYNAMIC DATA - "+ this.A);
             }
@@ -546,16 +584,17 @@ public class Memory implements ClockListener{
 
             palavra = bits8(i); //contém a palavra e o endereço do bit menos significativo (LSB)
 
-            if(endereco_init == endereco_inicial_TEXT && i < endereco_final_TEXT){ //condição para evitar que exceda o endereço limite do segmento inserida em cada bloco if else
+            if(endereco_init == endereco_inicial_TEXT && i <= endereco_final_TEXT){ //condição para evitar que exceda o endereço limite do segmento inserida em cada bloco if else
                 barraLateral.insertOnTextMemory(palavra); // 00 00 00 00   0x00000000
 
-            }else if(endereco_init == endereco_inicial_DYNAMIC_DATA && i < endereco_final_DYNAMIC_DATA){ 
+            }else if(endereco_init == endereco_inicial_DYNAMIC_DATA && i <= endereco_final_DYNAMIC_DATA){ 
                 barraLateral.insertOnDynamicMemory(palavra);
 
-            }else if(endereco_init == endereco_inicial_GLOBAL_DATA && i < endereco_final_GLOBAL_DATA){
+            }else if(endereco_init == endereco_inicial_GLOBAL_DATA && i <= endereco_final_GLOBAL_DATA){
                 barraLateral.insertOnGlobalMemory(palavra);
 
             }else{ //implementar futuramente para Reserved 1 e 2.
+                Main.showAlert(AlertType.WARNING, "Warning Dialog", "Memory address invalid", "Reserved segments have not been implemented graphically and the values ​​will not be visible.");
                 throw new IllegalArgumentException("[Memory.java]: insertAdressOnBar() - ERRO: Endereço de segmento de memória inválido ou endereço limite do segmento excedido - "+ endereco_init);
             }
         }
