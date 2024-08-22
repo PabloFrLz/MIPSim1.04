@@ -1,0 +1,24 @@
+NOTAS VER. 1.04:
+
+    1 - Suporte para a instrução xor do tipo-R.
+
+    2 - Inserção de comentários para auxiliar desenvolvedores que pretendam modificar o codigo para aumentar o conjunto de instruções 
+        suportadas pelo software do simulador.
+
+    3 - Simplificação dos codigos da ULA e UC.
+
+    4 - Adicionado o endereço da palavra ao centro do segmento GLOBAL DATA no registrador Global Pointer ($gp), e o endereço final do
+        segmento DYNAMIC DATA ao registrador Stack Pointer ($sp), conforme implementação original do MIPS.
+
+    5 - Removido o somador hipotético presente internamente na memória de dados. Com isso, não ocorre mais a soma do 
+        (offset + base) + Endereço_inicial_Segmento_DYNAMIC_DATA. Com isso, uma forma segura de acessar esse segmento de memória
+        seria usando o registrador $gp e somando a um valor que dê o endereço inicial do segmento DYNAMIC DATA:  
+                addi $t7, $gp, 64
+                sw $t0, 0($t7)
+
+    6 - Adicionado mais caixas de dialogo de alerta para quando o usuario inserir instruções não suportadas e quando exceder os limites dos 
+        segmentos suportados pelo simulador na versão 1.04.
+
+    7 - Agora ao carregar novas instruções, todo o segmento TEXT é apagado para não ter lixo de memória nos ciclos subsequentes.
+
+
