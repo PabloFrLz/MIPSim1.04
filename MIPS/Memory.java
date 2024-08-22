@@ -593,9 +593,10 @@ public class Memory implements ClockListener{
             }else if(endereco_init == endereco_inicial_GLOBAL_DATA && i <= endereco_final_GLOBAL_DATA){
                 barraLateral.insertOnGlobalMemory(palavra);
 
-            }else{ //implementar futuramente para Reserved 1 e 2.
-                Main.showAlert(AlertType.WARNING, "Warning Dialog", "Memory address invalid", "Reserved segments have not been implemented graphically and the values ​​will not be visible.");
-                throw new IllegalArgumentException("[Memory.java]: insertAdressOnBar() - ERRO: Endereço de segmento de memória inválido ou endereço limite do segmento excedido - "+ endereco_init);
+            }else{ //implementar futuramente para o segmento Reserved.
+                //Main.showAlert(AlertType.WARNING, "Warning Dialog", "Memory address invalid", "Reserved segments have not been implemented graphically and the values ​​will not be visible.");
+                //throw new IllegalArgumentException("[Memory.java]: insertAdressOnBar() - ERRO: Endereço de segmento de memória inválido ou endereço limite do segmento excedido - "+ endereco_init);
+                return;
             }
         }
         

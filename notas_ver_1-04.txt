@@ -16,8 +16,7 @@ NOTAS VER. 1.04:
                 addi $t7, $gp, 64
                 sw $t0, 0($t7)
 
-    6 - Adicionado mais caixas de dialogo de alerta para quando o usuario inserir instruções não suportadas e quando exceder os limites dos 
-        segmentos suportados pelo simulador na versão 1.04.
+    6 - Adicionado mais caixas de dialogo de alerta para quando o usuario inserir instruções não suportadas.
 
     7 - Agora ao carregar novas instruções, todo o segmento TEXT é apagado para não ter lixo de memória nos ciclos subsequentes.
 
