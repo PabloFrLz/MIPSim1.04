@@ -40,7 +40,7 @@ public class Memory implements ClockListener{
     public static int endereco_final_RESERVED_2;
 
     public boolean NOPFlag = false;
-    public int final_instruction;
+    public static int final_instruction;
     public static IntegerProperty current_instruction = new SimpleIntegerProperty(0); //variavel que contabiliza quantidade de instruções e dados carregados.
     
     
@@ -341,10 +341,10 @@ public class Memory implements ClockListener{
         this.barraLateral.setInstruction(instructionMap.get(bin));//mostra na barra lateral direita a instrução atual em assembly
         this.barraLateral.setInstructionBIN(bin);//mostra na barra lateral direita a instrução atual em binário
 
-        if ( (PC.getPC() > final_instruction) ){ // condição de parada - NOP instruction
+        /*if ( (PC.getPC() > final_instruction) ){ // condição de parada - NOP instruction
             NOPFlag = true;
             this.barraLateral.setInstruction("NOP");
-        }
+        }*/
 
         return bin;
     }
@@ -515,7 +515,8 @@ public class Memory implements ClockListener{
             if(this.A <= endereco_final_DYNAMIC_DATA && this.A >= endereco_inicial_TEXT){
                 WriteData(); //escreve no segmento de memoria escolhido entre DYNAMIC, GLOBAL e TEXT. Segmento RESERVED não é permitido escrita para esta versão do simulador. 
             }else{
-                throw new IllegalArgumentException("[Memory.java]: clock() - ERRO: Endereço de memória excedeu o endereço limite do segmento DYNAMIC DATA - "+ this.A);
+                Main.showAlert(AlertType.ERROR, "Error Dialog", "Invalid access segment", "Memory address ("+this.A+") exceeded the limit address of the DYNAMIC DATA segment ("+endereco_final_DYNAMIC_DATA+"), or is lower than the initial address of the TEXT segment ("+endereco_inicial_TEXT+").");
+                throw new IllegalArgumentException("[Memory.java]: clock() - ERROR: Memory address ("+this.A+") exceeded the limit address of the DYNAMIC DATA segment ("+endereco_final_DYNAMIC_DATA+"), or is lower than the initial address of the TEXT segment ("+endereco_inicial_TEXT+").");
             }
         } else{
             this.RD = getRD_Word();

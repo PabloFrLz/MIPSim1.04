@@ -20,17 +20,14 @@ or $t7, $t1, $t0
 slt $a1, $t0, $t1
 
 
-EXEMPLO 3:
+EXEMPLO 3: (Esse código executa indefinidamente.)
 addi $t0, $0, 100
 addi $t1, $0, 100
 beq $t0, $t1, 3
 addi $t2, $0, 400
-add $t4, $t0, $t1
+beq $t2, $t0, 5
 sub $t5, $t2, $t0
-and $t6, $t1, $t0
-or $t7, $t1, $t0
-slt $a1, $t0, $t1
-j 8208
+j 8200
 
 
 EXEMPLO 4:

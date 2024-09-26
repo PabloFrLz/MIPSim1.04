@@ -21,6 +21,7 @@ public class Terminal {
     private String direcao;
     private double largura_terminal;
     private double VELOCIDADE_ENERGIA = 1.0;
+    private double delay = 1.0; //variável para atrasos e adequações temporais - usada apenas na simulação paralela - na simulação sequencial é uma constante de valor 1
     private boolean uc_terminal;
     private boolean energizado; 
     private int id; //identificado dos terminais
@@ -49,9 +50,6 @@ public class Terminal {
         energia.setStroke(cor_energia);
         energia.setVisible(false);
 
-        /*if(this.cor_energia == Color.AQUA){ //condição para terminais da UC que possuem cor padrão diferente.
-        }*/
-
     }
 
     public Line getTerminal() { return terminal; }
@@ -62,6 +60,8 @@ public class Terminal {
     public boolean getEnergizado() { return this.energizado;}
 
     public void setEnergizado(boolean bool){ this.energizado = bool;}
+    public void setDelay(double val){this.delay = val;}
+    public static boolean getEfeitoBoxBlur(){ return efeitoBoxBlur;}
 
     public static void setEfeitoBoxBlur() { 
         if(efeitoBoxBlur){
@@ -126,32 +126,33 @@ public class Terminal {
             timeline.stop();
         }
 
+        
         // determinando o fluxo da energia com base nos parametros passados na chamada da função.
         if(direcao.equals("direita") || direcao.equals("baixo")){
-            incremento = VELOCIDADE_ENERGIA; //velocidade com que a energia vai avançar nos terminais.
+            incremento = VELOCIDADE_ENERGIA / delay; //velocidade com que a energia vai avançar nos terminais.
             end[0] = terminal.getEndX();
             end[1] = terminal.getEndY();
         }else if(direcao.equals("esquerda") || direcao.equals("cima")){
-            incremento = VELOCIDADE_ENERGIA * -1;
+            incremento = (VELOCIDADE_ENERGIA * -1) / delay;
             end[0] = terminal.getStartX();
             end[1] = terminal.getStartY();
         } else{
             throw new IllegalArgumentException("[Terminal.java]: energizar() - ERRO: direcao inválida - " + direcao);
         }
 
-        if(efeitoBoxBlur){ //aplica efeito ao carregar o terminal
-            Effects.efeitoBoxBlur(energia); //legal esse efeito
+        if(efeitoBoxBlur){
+            Effects.efeitoBoxBlur(energia); 
             //Effects.efeitoReflection(energia);
-            //Effects.efeitoBloom(energia); //sem efeito
-            //Effects.efeitoDisplacement(energia); //sem efeito, pelo menos para esse tipo de objeto
-            //Effects.efeitoGaussianBlur(energia); //mesma coisa do BoxBlur
+            //Effects.efeitoBloom(energia); 
+            //Effects.efeitoDisplacement(energia); 
+            //Effects.efeitoGaussianBlur(energia);
             //Effects.efeitoGlow(energia); 
             //Effects.efeitoInnerShadow(energia); 
             //Effects.efeitoLighting("Distant", energia); 
             //Effects.efeitoLighting("Point", energia); 
             //Effects.efeitoLighting("Spot", energia); 
-            //Effects.efeitoMotionBlur(energia); //mesma coisa que o BoxBlur e GaussianBlur
-            //Effects.efeitoSepiaTone(energia); //bom
+            //Effects.efeitoMotionBlur(energia);
+            //Effects.efeitoSepiaTone(energia);
             //Effects.efeitoShadow(energia);
             //Effects.efeitoColorAdjust(energia);
             //Effects.efeitoBlend(Effects.efeitoMotionBlur(energia), Effects.efeitoGlow(energia));
@@ -231,30 +232,6 @@ public class Terminal {
         terminal.setLayoutY(y);
         energia.setLayoutY(y);
     }
-
-
-    /*public void efeitoPisca(Line line, KeyFrame keyFrame){ // Criação da animação com o efeito de pisca
-       
-
-        // Adiciona o KeyFrame de movimento
-        timeline.getKeyFrames().add(keyFrame);
-
-        // Cria e adiciona o KeyFrame de piscar
-        KeyFrame blinkKeyFrame = new KeyFrame(Duration.millis(50), event -> {
-            energia.setVisible(!energia.isVisible());
-        });
-        timeline.getKeyFrames().add(blinkKeyFrame);
-
-        // Define o ciclo da animação para repetir até que o movimento seja concluído
-        timeline.setCycleCount(Timeline.INDEFINITE);
-
-        // Evento para parar a animação de piscar quando o movimento terminar
-        timeline.setOnFinished(event -> {
-            energia.setVisible(true); // Garante que a linha energia fique visível ao final
-        });
-
-        timeline.play();
-    }*/
 
     
 }

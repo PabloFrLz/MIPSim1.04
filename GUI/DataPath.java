@@ -17,7 +17,6 @@ public class DataPath{
     private int mod_y = Main.mod_y;
     private Terminal a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32,a33,a34,a35,a36,a37,a38,a39,a40,a41,a42,a43,a44,a45,a46,a47,a48,a49,a50,
     a51,a52,a53,a54,a55,a56,a57,a58,a59,a60,a61,a62,a63,a64,a65,a66,a67,a68,a69,a70,a71,a72,a73,a74,a75,a76,a77,a78,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27;
-    //delay1, delay2, delay3; //terminais delay são para atrasar o carregamento de alguns terminais. Serão necessários para a simulação paralela já que alguns terminais estavam carregando antes de outros.
     private ArrayList<StateActive> ativarEstado;
     private double speed_terminal = 1.0;
     private double speed_terminal_uc = 1.0; //velocidade da energia nos terminais da UC é mais rápido.
@@ -26,7 +25,8 @@ public class DataPath{
     private InfoPath infoPath;
     static List<Terminal> TerminalList;
     private static int last_terminal = 0; 
-    private static boolean disable_parallel_simulation = true;
+    private static int simultaneous_operation = 2; // 2 pois há "terminaisList" e "terminaisList2". Se houver mais listas, mudar o valor.
+    public static boolean enable_parallel = true;
 
     public DataPath(Pane rootLayout, InfoPath infoPath, ArrayList<StateActive> ativarEstado){
         this.terminaisHabilitados = new ArrayList<Terminal>();
@@ -196,6 +196,11 @@ public class DataPath{
         a70,a71,a72,a73,a74,a75,a76,a77,a78,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27);
 
         //applyEffectsOnTerminal();
+        //trecho apenas para aplicar a cor de terminal energizado nesses 4 terminais.
+        a66.setEnergizado(true);
+        a67.setEnergizado(true);
+        a68.setEnergizado(true);
+        a69.setEnergizado(true);
     }
 
     public void setInfoPath(InfoPath infoPath) { this.infoPath = infoPath;}
@@ -214,7 +219,7 @@ public class DataPath{
                 terminaisHabilitados.add(terminais.get(0)); //salva os terminais que estão habilitados para posteriormente desabilitar.
                 //verifica id para atualizar texto vinculado a entrada do terminal
                 infoPath.atualizaInfo(terminais.get(0).getId()); //cada info nos modulos (Text) está vinculado ao ID do terminal que se conecta a ele. Basta então passar o ID que o valor no Text será atualizado.
-
+                terminais.get(0).setDelay(1.0); //volta ao valor padrão 1.0
                 terminais.remove(0); // remove o primeiro terminal que já foi executado para que outro tome seu lugar no índice 0
                 if (!terminais.isEmpty()) {
                     //terminais.get(0).animacaoEspelhamento(); //testando nova animação de espelhamento.
@@ -222,34 +227,36 @@ public class DataPath{
                 } else {
                     timeline.stop(); // para a Timeline quando todos os terminais forem processados
                     terminais.clear();
+                    last_terminal++; //variavel que gantirá que apenas o ultimo terminal carregado em uma execução paralela, execute o if abaixo
+                    if(last_terminal == simultaneous_operation || !enable_parallel){ 
 
-                    //trecho para atualizar a posição do CURSOR na memória de instruções (TEXT Segment) 
-                    // beq - endereço relativo - atualiza o cursor
-                    if((MIPS.UC.state_UC.equals("S8") /* || MIPS.UC.state_UC.equals("estado no formato de string - "S1", "S2", etc...")*/ )  && Mips.OR_out){ 
-                        infoPath.atualizaInfo(150); //mostra graficamente PC = PC'
-                        Memory.current_instruction.set( Memory.current_instruction.get() + Mips.SignImm+1); 
-                        Main.counter_current_instruction = Memory.current_instruction.get();
-
-                    // j, jal, jr - endereço absoluto e indireto - atualiza o cursor
-                    }else if((MIPS.UC.state_UC.equals("S11") || MIPS.UC.state_UC.equals("S12") 
-                            || MIPS.UC.state_UC.equals("S13") /* || MIPS.UC.state_UC.equals("estado no formato de string - "S1", "S2", etc...") */  ) && Mips.OR_out){ 
-                        infoPath.atualizaInfo(150); 
-                        int calc = (PC.getPC() - Memory.endereco_inicial_TEXT) / 4; //calculo para obter o deslocamento para o cursor da listview da memoria Text.
-                        Memory.current_instruction.set( calc ); 
-                        Main.counter_current_instruction = Memory.current_instruction.get();
-
-                    }
-
-
-                    last_terminal++; //variavel que gantirá que o ultimo terminal em uma execução paralela, execute o if abaixo
-                    if(last_terminal == 2 || disable_parallel_simulation){ // 2 pois estou usando paralelismo com duas listas "terminaisList" e "terminaisList2". Se houver mais listas, mudar o valor 2
+                        //___________ (Trecho para atualizar a posição do CURSOR na memória de instruções (TEXT Segment)) ___________ 
+                        // beq - endereço relativo - atualiza o cursor
+                        if((MIPS.UC.state_UC.equals("S8") /* || MIPS.UC.state_UC.equals("estado no formato de string - "S1", "S2", etc...")*/ )  && Mips.OR_out){ 
+                            infoPath.atualizaInfo(150); //mostra graficamente PC = PC'
+                            Memory.current_instruction.set( Memory.current_instruction.get() + Mips.SignImm+1); 
+                            Main.counter_current_instruction = Memory.current_instruction.get();
+    
+                        // j, jal, jr - endereço absoluto e indireto - atualiza o cursor
+                        }else if((MIPS.UC.state_UC.equals("S11") || MIPS.UC.state_UC.equals("S12") 
+                                || MIPS.UC.state_UC.equals("S13") /* || MIPS.UC.state_UC.equals("estado no formato de string - "S1", "S2", etc...") */  ) && Mips.OR_out){ 
+                            infoPath.atualizaInfo(150); 
+                            int calc = (PC.getPC() - Memory.endereco_inicial_TEXT) / 4; //calculo para obter o deslocamento para o cursor da listview da memoria Text.
+                            Memory.current_instruction.set( calc ); 
+                            Main.counter_current_instruction = Memory.current_instruction.get();
+                        }
+                        
+                        // _________________ (trecho que prepara a próxima simulação) ________________________
                         infoPath.showWaitClock(); // mostra a mensagem "waiting clock..." novamente. 
                         Main.clockButton.setDisable(false); // habilita o botão de clock e stop novamente para ser pressionado.
                         Main.stopButton.setDisable(false); 
+                        BarraLateral.toggleSwitch1.setDisable(false); //habilita os toggle switchs novamente.
+                        BarraLateral.toggleSwitch2.setDisable(false);
                         for(StateActive clock : Main.clockActivate){ //desabilita a animação de clock, indicando que houve uma borda de descida e o estado atual está finalizado.
                             clock.falling_edge();
                         }  
                         last_terminal = 0;
+                        simultaneous_operation = 2; // por padrão é 2 pois na maioria dos casos da pra simular com apenas 2 operações em paralelo.
                     }
                 }
             }
@@ -261,6 +268,9 @@ public class DataPath{
 
 
 
+
+
+    //______________________________________________________________________________________________________________________________________________________________
     public void FSMStates(int state) {
         ArrayList<Terminal> terminais = new ArrayList<Terminal>();
         List<Terminal> terminaisList = null;
@@ -269,28 +279,29 @@ public class DataPath{
         if(state == 0){ // estado S0
             terminaisList = Arrays.asList(t9,t25,t26,t27,a1,t1,t2,a2,a3,t5,t6,a31,a32,a33,a34,t19,t20,a40,a24,t17,t18,a41,a42,a43,t15,t16,a44,a45,a46,a47,a48,t11,t12,t13,t14,a70,a71,a72,a73,a74); //os terminais serão executados na sequencia que foram inseridos em "terminaisList".
 
+
         }else if(state == 1){ //estado S1
-            //terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27); //trecho necessário para mostrar graficamente a desabilitação de PCWrite e IRWrite no inicio do estado S1.
             infoPath.atualizaInfo(150); //mostra graficamente PC = PC'
             infoPath.atualizaInfo(6); //mostra graficamente RI(output) = mem[PC] 
             if(MIPS.UC.instr.equals("Tipo-R")){  // Tipo-R     
-                terminaisList = Arrays.asList(t5,t6,t9,t25,t26,t27,a6,a7,a8,a9,a10,a11,a12,a14,a25,a26,t19,t20,t17,t18); 
+                terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a8,a9,a10,a11,a12,a14,a25,a26); 
             } 
             else if(MIPS.UC.instr.equals("addi") || MIPS.UC.instr.equals("lw") || MIPS.UC.instr.equals("lb")){  // addi, lw, lb
-                terminaisList = Arrays.asList(t5,t6,t9,t25,t26,t27,a6,a7,a9,a10,a11,a13,a25,a18,a19,a20,a21);
+                terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a9,a10,a11,a13,a25,a18,a19,a20,a21);
             } 
             else if(MIPS.UC.instr.equals("sw") || MIPS.UC.instr.equals("sb")){  // sw, sb
-                terminaisList = Arrays.asList(t5,t6,t9,t25,t26,t27,a6,a7,a9,a10,a11,a12,a25,a26,a18,a19,a20,a21);
+                terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a9,a10,a11,a12,a25,a26,a18,a19,a20,a21);
             } 
             else if(MIPS.UC.instr.equals("beq")){  // beq
-                terminaisList = Arrays.asList(t5,t6,t9,t25,t26,t27,a6,a7,a9,a10,a11,a12,a25,a26,a18,a19,a22,a23,a31,a32,a33,a34,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44);
+                terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a9,a10,a11,a12,a25,a26,a18,a19,a22,a23,a31,a32,a33,a34,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44);
             } 
             else if(MIPS.UC.instr.equals("j") || MIPS.UC.instr.equals("jal")){ // j, jal 
-                terminaisList = Arrays.asList(t5,t6,t9,t25,t26,t27,a6,a7,a8,a9,a10,a31,a32,a66,a67,a68,a69,a60,a61,a62,a63,a64,a65);
+                terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a8,a9,a10,a31,a32,a66,a67,a68,a69,a60,a61,a62,a63,a64,a65);
             } 
             else if(MIPS.UC.instr.equals("jr")){  // jr
-                terminaisList = Arrays.asList(t5,t6,t9,t25,t26,t27,a6,a7,a8,a9,a10,a11,a12,a25,a26);
+                terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a8,a9,a10,a11,a12,a25,a26);
             } 
+
 
         }else if(state == 2){ //estado S2
             if(MIPS.UC.instr.equals("lw") || MIPS.UC.instr.equals("lb")){ //lw, lb
@@ -301,40 +312,52 @@ public class DataPath{
                 else{                terminaisList = Arrays.asList(a27,a28,a29,a35,a36,a37,a38,a39,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44);}
             }
             
+
         }else if(state == 3){ //estado s3
             terminaisList = Arrays.asList(a49,a53,a54,a57,a58,a59,t1,t2,a2,a3,a4,a5);
             
+
         }else if(state == 4){ //estado s4
             terminaisList = Arrays.asList(t7,a15,a16,t8,a17,t21,t22); 
             
+
         }else if(state == 5){ //estado s5
             terminaisList = Arrays.asList(a49,a53,a54,a57,a58,a59,t1,t2,a2,t3,t4); 
             
+
         }else if(state == 6){ //estado s6
             if(enableFlagZero){ terminaisList = Arrays.asList(a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a50,a51,a52,a44);}
             else{               terminaisList = Arrays.asList(a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44);}
             
+
         }else if(state == 7){ //estado s7
             terminaisList = Arrays.asList(a49,a53,a54,a55,a56,t8,a17,t7,a15,t21,t22);
              
+
         }else if(state == 8){ //estado s8
             terminaisList = Arrays.asList(a49,t11,t12,t13,t14,a70,a71,a72,a73,a74,a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44,a50,a51,a52,t10,t23,t24,t25,t26,t27);
+
 
         }else if(state == 9){ //estado s9
             if(enableFlagZero){   terminaisList = Arrays.asList(a27,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a50,a51,a52,a44);} 
             else{                 terminaisList = Arrays.asList(a27,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44); }
 
+
         }else if(state == 10){ //estado s10
             terminaisList = Arrays.asList(a49,a53,a54,a55,a56,t8,a17,t7,a15,t21,t22);
         
+
         }else if(state == 11){ //estado s11
             terminaisList = Arrays.asList(t11,t12,t13,t14,a70,a71,a72,a73,a74,t9,t25,t26,t27);
 
+
         }else if(state == 12){ //estado s12
-            terminaisList = Arrays.asList(a75,a76,a77,a78,t8,a17,a15,t21,t22,t11,t12,t13,t14,a70,a71,a72,a73,a74,t9,t25,t26,t27);
+            terminaisList = Arrays.asList(a75,a76,a77,a78,t8,a17,t7,a15,t21,t22,t11,t12,t13,t14,a70,a71,a72,a73,a74,t9,t25,t26,t27);
+
 
         }else if(state == 13){ //estado s13
             terminaisList = Arrays.asList(a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44,a45,a46,a47,a48,t11,t12,t13,t14,a70,a71,a72,a73,a74,t9,t25,t26,t27);
+
 
         }/*else if(state == (inserir numero inteiro do estado )){ 
             terminaisList = Arrays.asList(a1, ..., a78, t1, ..., t27); //inserir a variavel que representa os terminais que voce deseja que seja carregado sequencialmente na GUI.
@@ -350,64 +373,168 @@ public class DataPath{
         
     }
 
+
+
+
+
+
+
+    //_____________________________________________________________________________________________________________________________________________________________________________________
     //metodo em fase de testes para implementar uma simulação paralela.
-    /*public void FSMStatesParallel(int state) {
+    public void FSMStatesParallel(int state) {
         ArrayList<Terminal> terminais = new ArrayList<Terminal>();
         List<Terminal> terminaisList = null;
         ArrayList<Terminal> terminais2 = new ArrayList<Terminal>();
         List<Terminal> terminaisList2 = null;
+        ArrayList<Terminal> terminais3 = new ArrayList<Terminal>();
+        List<Terminal> terminaisList3 = null;
+        ArrayList<Terminal> terminais4 = new ArrayList<Terminal>();
+        List<Terminal> terminaisList4 = null;
 
         //definição
         if(state == 0){ // estado S0
-            terminaisList = Arrays.asList(t9,t25,t26,t27,a1,a2,a3,t15,t16,t11,t12,t13); //os terminais serão executados na sequencia que foram inseridos em "terminaisList" e "terminaisList2".
-            terminaisList2 = Arrays.asList(t1,t2,t5,t6,t19,t20,t17,t18,delay2,a31,a32,a33,a34,a40,a24,a41,a42,a43,a44,a45,a46,a47,a48,t14,a70,a71,a72,a73,a74);
-            //terminais como "delay2" servem apenas para dar um atraso antes que um terminal especifico carregue. É usado para adequar os tempos de carregamento. Não estao inseridos na interface.
+            a1.setDelay(5.0); //metodo usado para se adedquar ao tempo atrasando a propagação nos terminais. Quanto maior o valor mais lento será a carga.
+            a2.setDelay(10.0);
+            a3.setDelay(10.0);
+            t18.setDelay(2.0);
+            a24.setDelay(2.0);
+            a40.setDelay(7.0);
+            a41.setDelay(5.0);
+            a42.setDelay(5.0);
+            a43.setDelay(5.0);
+            a44.setDelay(2.0);
+            a45.setDelay(2.0);
+            a46.setDelay(2.0);
+            a47.setDelay(2.0);
+            a48.setDelay(2.0);
+            terminaisList = Arrays.asList(t9,t25,t26,t27,a1,a2,a3,a41,a42,a43,t11,t12,t13,t14); //os terminais serão executados na sequencia que foram inseridos em "terminaisList" e "terminaisList2".
+            terminaisList2 = Arrays.asList(t1,t2,t5,t6,t19,t20,t17,t18,a31,a32,a33,a34,a24,a40,t15,t16,a44,a45,a46,a47,a48,a70,a71,a72,a73,a74);    
+    
         }else if(state == 1){ //estado S1
-            //terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27); //trecho necessário para mostrar graficamente a desabilitação de PCWrite e IRWrite no inicio do estado S1.
+            infoPath.atualizaInfo(150); //mostra graficamente PC = PC'
+            infoPath.atualizaInfo(6); //mostra graficamente RI(output) = mem[PC] 
+            simultaneous_operation = 3; // 3 pois irá usar "terminaisList3".
 
             if(MIPS.UC.instr.equals("Tipo-R")){  // Tipo-R    
-                terminaisList = Arrays.asList(a1,a2,a3,a6,a7,a8,a9,a10,a11,a12,a14,a25,a26); 
-                terminaisList2 = Arrays.asList(t5,t6,t9,t25,t26,t27,t19,t20,t17,t18); 
+                terminaisList = Arrays.asList(t5,t6,a1,a2,a3,t9,t25,t26,t27); 
+                terminaisList2 = Arrays.asList(a6,a7,a8,a9,a12,a25); 
+                terminaisList3 = Arrays.asList(a10,a11,a14,a26);
 
-            } else if(MIPS.UC.instr.equals("addi") || MIPS.UC.instr.equals("lw")){  // addi e lw
-                //terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a9,a10,a11,a13,a25,a18,a19,a20,a21);
-                terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27);
-                terminaisList2 = Arrays.asList(a6,a7,a9,a10,a11,a13,a25,a18,a19,a20,a21); 
+            } else if(MIPS.UC.instr.equals("addi") || MIPS.UC.instr.equals("lw") || MIPS.UC.instr.equals("lb")){  // addi, lw e lb
+                a1.setDelay(3.0); 
+                a2.setDelay(3.0);
+                a3.setDelay(3.0);
+                terminaisList = Arrays.asList(t5,t6,a1,a2,a3,t9,t25,t26,t27);
+                terminaisList2 = Arrays.asList(a6,a7,a9,a13,a25);
+                terminaisList3 = Arrays.asList(a10,a11,a18,a19,a20,a21); 
 
-            } else if(MIPS.UC.instr.equals("sw")){  terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a9,a10,a11,a12,a25,a26,a18,a19,a20,a21);} // sw 
-            else if(MIPS.UC.instr.equals("beq")){  terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a9,a10,a11,a12,a25,a26,a18,a19,a22,a23,a31,a32,a33,a34,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44);} // beq
-            else if(MIPS.UC.instr.equals("j") || MIPS.UC.instr.equals("jal")){  terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a8,a9,a10,a31,a32,a66,a67,a68,a69,a60,a61,a62,a63,a64,a65);} // j e jal
-            else if(MIPS.UC.instr.equals("jr")){  terminaisList = Arrays.asList(a1,a2,t5,t6,a3,t9,t25,t26,t27,a6,a7,a8,a9,a10,a11,a12,a25,a26);} // jr
+            } else if(MIPS.UC.instr.equals("sw") || MIPS.UC.instr.equals("sb")){  // sw e sb
+                terminaisList = Arrays.asList(t5,t6,a1,a2,a3,t9,t25,t26,t27);
+                terminaisList2 = Arrays.asList(a6,a7,a9,a12,a25);
+                terminaisList3 = Arrays.asList(a10,a11,a26,a18,a19,a20,a21);
+                
+            } else if(MIPS.UC.instr.equals("beq")){ // beq
+                simultaneous_operation = 4; // 4 pois irá usar "terminaisList4".
+                a33.setDelay(2.0);
+                a34.setDelay(2.0);
+                t20.setDelay(2.0);
+                t19.setDelay(1.5);
+                terminaisList = Arrays.asList(a1,t5,t6,a2,a3,t9,t25,t26,t27);
+                terminaisList2 = Arrays.asList(a6,a7,a9,a12,a25,t19,t20,a40,t15,t16,a44);
+                terminaisList3 = Arrays.asList(a10,a11,a26,a18,a19,a22,a23);
+                terminaisList4 = Arrays.asList(a31,a32,a33,a34,t17,t18,a41,a42,a43);
 
+            } else if(MIPS.UC.instr.equals("j") || MIPS.UC.instr.equals("jal")){ // j e jal
+                simultaneous_operation = 4;
+                a61.setDelay(2.0);
+                a62.setDelay(2.0);
+                a64.setDelay(2.0);
+                terminaisList = Arrays.asList(a1,t5,t6,a2,a3,t9,t25,t26,t27);
+                terminaisList2 = Arrays.asList(a6,a7,a8,a9);
+                terminaisList3 = Arrays.asList(a10,a60,a61,a62,a63,a64,a65);
+                terminaisList4 = Arrays.asList(a31,a32,a66,a67,a68,a69);
+
+            } else if(MIPS.UC.instr.equals("jr")){ // jr
+                terminaisList = Arrays.asList(t5,t6,a1,a2,a3,t9,t25,t26,t27); 
+                terminaisList2 = Arrays.asList(a6,a7,a8,a9,a12,a25); 
+                terminaisList3 = Arrays.asList(a10,a11,a26);
+
+            } 
+
+        
         }else if(state == 2){ //estado S2
-            if(MIPS.UC.instr.equals("lw")){ //lw
-                if(enableFlagZero){  terminaisList = Arrays.asList(a27,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a50,a51,a52,a44);}
-                else{                terminaisList = Arrays.asList(a27,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44);}
-            }else if(MIPS.UC.instr.equals("sw")){ //sw
-                if(enableFlagZero){  terminaisList = Arrays.asList(a27,a28,a29,a35,a36,a37,a38,a39,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a50,a51,a52,a44);}
-                else{                terminaisList = Arrays.asList(a27,a28,a29,a35,a36,a37,a38,a39,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44);}
+            t20.setDelay(2.0);
+            if(MIPS.UC.instr.equals("lw") || MIPS.UC.instr.equals("lb")){ //lw e lb
+                terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16,a44);
+                if(enableFlagZero){  
+                    terminaisList2 = Arrays.asList(t17,t18,a41,a42,a43,a50,a51,a52);
+                }else{                
+                    terminaisList2 = Arrays.asList(t17,t18,a41,a42,a43);
+                }
+
+            }else if(MIPS.UC.instr.equals("sw") || MIPS.UC.instr.equals("sb")){ //sw e sb
+                simultaneous_operation = 3; // 3 pois irá usar "terminaisList3".
+                terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16,a44);
+                terminaisList3 = Arrays.asList(a28,a29,a35,a36,a37,a38,a39);
+                if(enableFlagZero){  
+                    terminaisList2 = Arrays.asList(t17,t18,a41,a42,a43,a50,a51,a52);
+                }else{                
+                    terminaisList2 = Arrays.asList(t17,t18,a41,a42,a43);
+                }
             }
             
+        
         }else if(state == 3){ //estado s3
-            terminaisList = Arrays.asList(a49,a53,a54,a57,a58,a59,t1,t2,a2,a3,a4,a5);
-            
+            t1.setDelay(2.0);
+            t2.setDelay(2.0);
+            terminaisList = Arrays.asList(a49,a53,a54,a57,a58,a59,a2,a3,a4,a5);
+            terminaisList2 = Arrays.asList(t1,t2);
+        
         }else if(state == 4){ //estado s4
-            terminaisList = Arrays.asList(t7,a15,a16,t8,a17,t21,t22); 
-            
+            t7.setDelay(2.0);
+            terminaisList = Arrays.asList(t7,a15,t21,t22); 
+            terminaisList2 = Arrays.asList(a16,t8,a17);
+        
         }else if(state == 5){ //estado s5
-            terminaisList = Arrays.asList(a49,a53,a54,a57,a58,a59,t1,t2,a2,t3,t4); 
-            
+            t1.setDelay(2.0);
+            t2.setDelay(2.0);
+            t3.setDelay(2.0);
+            t4.setDelay(2.0);
+            terminaisList = Arrays.asList(a49,a53,a54,a57,a58,a59,a2); 
+            terminaisList2 = Arrays.asList(t1,t2,t3,t4);
+        
         }else if(state == 6){ //estado s6
-            if(enableFlagZero){ terminaisList = Arrays.asList(a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a50,a51,a52,a44);}
-            else{               terminaisList = Arrays.asList(a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44);}
+            a40.setDelay(2.0);
+            t20.setDelay(2.0);
+            if(enableFlagZero){ 
+                terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16,a50,a51,a52);
+                terminaisList2 = Arrays.asList(a28,a29,a30,t17,t18,a41,a42,a43,a44);
+            }else{
+                terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16);
+                terminaisList2 = Arrays.asList(a28,a29,a30,t17,t18,a41,a42,a43,a44);
+            }
             
+        
         }else if(state == 7){ //estado s7
-            terminaisList = Arrays.asList(a49,a53,a54,a55,a56,t8,a17,t7,a15,t21,t22);
+            t7.setDelay(3.0);
+            a15.setDelay(3.0);
+            t8.setDelay(2.0);
+            terminaisList = Arrays.asList(a49,a53,a54,a55,a56,a17,t21,t22);
+            terminaisList2 = Arrays.asList(t7,a15,t8);
              
+        
         }else if(state == 8){ //estado s8
-            terminaisList = Arrays.asList(a49,t11,t12,t13,t14,a70,a71,a72,a73,a74,a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44,a50,a51,a52,t10,t23,t24,t25,t26,t27,a1);
+            //terminaisList = Arrays.asList(a49,t11,t12,t13,t14,a70,a71,a72,a73,a74,a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44,a50,a51,a52,t10,t23,t24,t25,t26,t27,a1);
+            simultaneous_operation = 3;
+            t20.setDelay(2.0);
+            t10.setDelay(2.0);
+            terminaisList = Arrays.asList(t11,t12,t13,t14,a49,a70,a71,a72,a73,a74);
+            terminaisList2 = Arrays.asList(a27,t19,t20,a40,t15,t16,a44,a50,a51,a52);
+            terminaisList3 = Arrays.asList(a28,a29,a30,t17,t18,a41,a42,a43,t10,t23,t24,t25,t26,t27);
 
+        
         }else if(state == 9){ //estado s9
+            t20.setDelay(2.0);
             if(enableFlagZero){   
                 terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16,a44,a50,a51,a52); 
                 terminaisList2 = Arrays.asList(t17,t18,a41,a42,a43); 
@@ -416,21 +543,43 @@ public class DataPath{
                 terminaisList2 = Arrays.asList(t17,t18,a41,a42,a43); 
             }
 
+        
         }else if(state == 10){ //estado s10
-            terminaisList = Arrays.asList(a49,a53,a54,a55,a56,t8,a17,t21,t22);
-            terminaisList2 = Arrays.asList(t7,a15);
+            t7.setDelay(3.0);
+            a15.setDelay(3.0);
+            t8.setDelay(2.0);
+            terminaisList = Arrays.asList(a49,a53,a54,a55,a56,a17,t21,t22);
+            terminaisList2 = Arrays.asList(t7,a15,t8);
+        
         
         }else if(state == 11){ //estado s11
-            terminaisList = Arrays.asList(t11,t12,t13,t14,a70,a71,a72,a73,a74,t9,t25,t26,t27,a1);
+            t27.setDelay(2.0);
+            t9.setDelay(2.0);
+            t25.setDelay(2.0);
+            terminaisList = Arrays.asList(t11,t12,t13,t14,a70,a71,a72,a73,a74);
+            terminaisList2 = Arrays.asList(t9,t25,t26,t27);
 
+        
         }else if(state == 12){ //estado s12
-            terminaisList = Arrays.asList(a75,a76,a77,a78,t8,a17,a15,t21,t22);
-
+            simultaneous_operation = 3;
+            t7.setDelay(2.0);
+            a15.setDelay(2.0);
+            t9.setDelay(2.0);
+            t25.setDelay(2.0);
+            terminaisList = Arrays.asList(a75,a76,a77,a78,t8,a17,t21,t22);
+            terminaisList2 = Arrays.asList(t7,a15,t9,t25,t26,t27);
+            terminaisList3 = Arrays.asList(t11,t12,t13,t14,a70,a71,a72,a73,a74);
+        
         }else if(state == 13){ //estado s13
-            terminaisList = Arrays.asList(a27,a28,a29,a30,t19,t20,a40,t17,t18,a41,a42,a43,t15,t16,a44,a45,a46,a47,a48,t11,t12,t13,t14,a70,a71,a72,a73,a74,t9,t25,t26,t27,a1);
+            t20.setDelay(2.0);
+            a40.setDelay(2.0);
+            a48.setDelay(2.0);
+            terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16,a44,a45,a46,a47,a48,t9,t25,t26,t27);
+            terminaisList2 = Arrays.asList(a28,a29,a30,t17,t18,a41,a42,a43,t11,t12,t13,t14,a70,a71,a72,a73,a74);
 
+        
         }else {
-            throw new IllegalArgumentException("[DataPath.java]: FSMStates() - ERRO: Estado inválido - state is " + state);
+            throw new IllegalArgumentException("[DataPath.java]: FSMStatesParallel() - ERRO: Estado inválido - state is " + state);
         }
 
         ativarEstado.get(state).ativar(); //acende o estado "S0" na barra de estados quando state == 0, state == 1 acende o S1, e assim por diante.
@@ -441,88 +590,159 @@ public class DataPath{
             terminais2.addAll(terminaisList2);
             executaAnimacao(terminais2);
         }
-        
-    }*/
+
+        if(terminaisList3 != null){
+            terminais3.addAll(terminaisList3);
+            executaAnimacao(terminais3);
+        }
+
+        if(terminaisList4 != null){
+            terminais4.addAll(terminaisList4);
+            executaAnimacao(terminais4);
+        }
+
+    }
+
 
     //_____________________________________________________________________________________________________________
     //Caminho dos dados para instruções do Tipo-R
     public void tipoR(int cycle){ //add, sub, and, or, slt
         //s0, s1, s6, s7
-        if(cycle == 0){ FSMStates(0); //executa o datapath do estado S0
-        }else if(cycle == 1){ FSMStates(1); //executa o datapath do estado S1, que para instruções do tipo-R, apenas decodifica a instrução
-        }else if(cycle == 2){ FSMStates(6); //executa o datapath do estado S6
-        }else if(cycle == 3){ FSMStates(7);} //executa o datapath do estado S7
-        
-    }
-
-    //_____________________________________________________________________________________________________________
-    public void addi(int cycle){
-        //s0, s1, s9, s10
-
-        if(cycle == 0){ FSMStates(0); 
-        }else if(cycle == 1){ FSMStates(1); // S1
-        }else if(cycle == 2){ FSMStates(9); // S9  
-        }else if(cycle == 3){ FSMStates(10);} // S10
-        
-    }
-
-    //_____________________________________________________________________________________________________________
-    public void lw(int cycle){
-        //s0, s1, s2, s3, s4
-        if(cycle == 0){ FSMStates(0); 
-        }else if(cycle == 1){  FSMStates(1); // S1
-        }else if(cycle == 2){  FSMStates(2); // S2
-        }else if(cycle == 3){  FSMStates(3); // S3
-        }else if(cycle == 4){  FSMStates(4);}// S4
-        
-    }
-
-    //_____________________________________________________________________________________________________________
-    public void sw(int cycle){
-        //s0, s1, s2, s5
-        if(cycle == 0){ FSMStates(0); //S0 
-        }else if(cycle == 1){ FSMStates(1); // S1
-        }else if(cycle == 2){ FSMStates(2); // S2
-        }else if(cycle == 3){ FSMStates(5);} // S5
-
-    }
-
-    //_______________________________________________________________________________________________________________________________
-    public void beq(int cycle){
-        //s0, s1, s8
-        if(cycle == 0){ FSMStates(0); // S0
-        }else if(cycle == 1){ FSMStates(1); // S1
-        }else if(cycle == 2){ FSMStates(8);} // S8
-            
-    }
-
-    //_______________________________________________________________________________________________________________________________
-    public void j(int cycle){
-        //s0, s1, s11
-        if(cycle == 0){  FSMStates(0); // S0
-        }else if(cycle == 1){ FSMStates(1); // S1
-        }else if(cycle == 2){  FSMStates(11);} // S11
-        
-    }
-
-    //_______________________________________________________________________________________________________________________________
-    public void jal(int cycle){
-        //s0, s1, s12, s11
-        if(cycle == 0){ FSMStates(0); // S0
-        }else if(cycle == 1){ FSMStates(1);  // S1
-        }else if(cycle == 2){ FSMStates(12); // S12
+        if(enable_parallel){
+            if(cycle == 0){ FSMStatesParallel(0); //executa o datapath do estado S0
+            }else if(cycle == 1){ FSMStatesParallel(1); //executa o datapath do estado S1, que para instruções do tipo-R, apenas decodifica a instrução
+            }else if(cycle == 2){ FSMStatesParallel(6); //executa o datapath do estado S6
+            }else if(cycle == 3){ FSMStatesParallel(7);} //executa o datapath do estado S7
+        }else{
+            if(cycle == 0){ FSMStates(0); //executa o datapath do estado S0
+            }else if(cycle == 1){ FSMStates(1); //executa o datapath do estado S1, que para instruções do tipo-R, apenas decodifica a instrução
+            }else if(cycle == 2){ FSMStates(6); //executa o datapath do estado S6
+            }else if(cycle == 3){ FSMStates(7);} //executa o datapath do estado S7
         }
         
     }
 
+
+    //_____________________________________________________________________________________________________________
+    public void addi(int cycle){
+        //s0, s1, s9, s10
+        if(enable_parallel){
+            if(cycle == 0){ FSMStatesParallel(0); 
+            }else if(cycle == 1){ FSMStatesParallel(1); // S1
+            }else if(cycle == 2){ FSMStatesParallel(9); // S9  
+            }else if(cycle == 3){ FSMStatesParallel(10);} // S10
+        }else{
+            if(cycle == 0){ FSMStates(0); 
+            }else if(cycle == 1){ FSMStates(1); // S1
+            }else if(cycle == 2){ FSMStates(9); // S9  
+            }else if(cycle == 3){ FSMStates(10);} // S10
+        }
+        
+    }
+
+
+    //_____________________________________________________________________________________________________________
+    public void lw(int cycle){
+        //s0, s1, s2, s3, s4
+        if(enable_parallel){
+            if(cycle == 0){ FSMStatesParallel(0); 
+            }else if(cycle == 1){  FSMStatesParallel(1); // S1
+            }else if(cycle == 2){  FSMStatesParallel(2); // S2
+            }else if(cycle == 3){  FSMStatesParallel(3); // S3
+            }else if(cycle == 4){  FSMStatesParallel(4);}// S4
+        }else{
+            if(cycle == 0){ FSMStates(0); 
+            }else if(cycle == 1){  FSMStates(1); // S1
+            }else if(cycle == 2){  FSMStates(2); // S2
+            }else if(cycle == 3){  FSMStates(3); // S3
+            }else if(cycle == 4){  FSMStates(4);}// S4
+        }
+        
+    }
+
+
+    //_____________________________________________________________________________________________________________
+    public void sw(int cycle){
+        //s0, s1, s2, s5
+
+        if(enable_parallel){
+            if(cycle == 0){ FSMStatesParallel(0); //S0 
+            }else if(cycle == 1){ FSMStatesParallel(1); // S1
+            }else if(cycle == 2){ FSMStatesParallel(2); // S2
+            }else if(cycle == 3){ FSMStatesParallel(5);} // S5
+        }else{
+            if(cycle == 0){ FSMStates(0); //S0 
+            }else if(cycle == 1){ FSMStates(1); // S1
+            }else if(cycle == 2){ FSMStates(2); // S2
+            }else if(cycle == 3){ FSMStates(5);} // S5
+        }
+
+    }
+
+
+    //_______________________________________________________________________________________________________________________________
+    public void beq(int cycle){
+        //s0, s1, s8
+        if(enable_parallel){
+            if(cycle == 0){ FSMStatesParallel(0); // S0
+            }else if(cycle == 1){ FSMStatesParallel(1); // S1
+            }else if(cycle == 2){ FSMStatesParallel(8);} // S8
+        }else{
+            if(cycle == 0){ FSMStates(0); // S0
+            }else if(cycle == 1){ FSMStates(1); // S1
+            }else if(cycle == 2){ FSMStates(8);} // S8
+        }
+            
+    }
+
+
+    //_______________________________________________________________________________________________________________________________
+    public void j(int cycle){
+        //s0, s1, s11
+        if(enable_parallel){
+            if(cycle == 0){  FSMStatesParallel(0); // S0
+            }else if(cycle == 1){ FSMStatesParallel(1); // S1
+            }else if(cycle == 2){  FSMStatesParallel(11);} // S11
+        }else{
+            if(cycle == 0){  FSMStates(0); // S0
+            }else if(cycle == 1){ FSMStates(1); // S1
+            }else if(cycle == 2){  FSMStates(11);} // S11
+        }
+        
+    }
+
+
+    //_______________________________________________________________________________________________________________________________
+    public void jal(int cycle){
+        //s0, s1, s12, s11
+        if(enable_parallel){
+            if(cycle == 0){ FSMStatesParallel(0); // S0
+            }else if(cycle == 1){ FSMStatesParallel(1);  // S1
+            }else if(cycle == 2){ FSMStatesParallel(12);} // S12
+        }else{
+            if(cycle == 0){ FSMStates(0); // S0
+            }else if(cycle == 1){ FSMStates(1);  // S1
+            }else if(cycle == 2){ FSMStates(12);} // S12
+        }
+        
+    }
+
+
     //_______________________________________________________________________________________________________________________________
     public void jr(int cycle){
         //s0, s1, s13
-        if(cycle == 0){ FSMStates(0);  // S0
-        }else if(cycle == 1){ FSMStates(1); // S1
-        }else if(cycle == 2){ FSMStates(13);} // S13  
+        if(enable_parallel){
+            if(cycle == 0){ FSMStatesParallel(0);  // S0
+            }else if(cycle == 1){ FSMStatesParallel(1); // S1
+            }else if(cycle == 2){ FSMStatesParallel(13);} // S13 
+        }else{
+            if(cycle == 0){ FSMStates(0);  // S0
+            }else if(cycle == 1){ FSMStates(1); // S1
+            }else if(cycle == 2){ FSMStates(13);} // S13  
+        }
 
     }
+
 
     //_______________________________________________________________________________________________________________________________
     /*public void nome_nova_instrucao(int cycle){ //implemente um novo metodo que executara o caminho de dados da instrução na GUI. 
@@ -553,6 +773,15 @@ public class DataPath{
             //Effects.efeitoGlow(a.getEnergia()); // aplica efeito na energia (laranjado por padrão)
         }
 
+    }
+
+    public static void setEnableParallel() { 
+        if(enable_parallel){
+            enable_parallel = false;
+            //Terminal.setDelay(1); //seta para 1 novamente a variavel que controla o tempo de carga nos terminais
+        }else{
+            enable_parallel = true;
+        }
     }
 
 }

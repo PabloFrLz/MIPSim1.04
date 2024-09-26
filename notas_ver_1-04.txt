@@ -20,4 +20,11 @@ NOTAS VER. 1.04:
 
     7 - Agora ao carregar novas instruções, todo o segmento TEXT é apagado para não ter lixo de memória nos ciclos subsequentes.
 
+    8 - Caso o endereço lido da memoria exceda o segmento DYNAMIC DATA ou seja inferior ao segmento TEXT, Um pop-up de erro é gerado 
+        informando sobre o acesso em uma região de memória restrita atualmente.
+
+    9 - Simulação em paralelo implementada e removido o toggle switch "RADIANT TERMINAL" e inserido o "PARALLEL SIMULATION".
+
+    10 - Desativação dos toggle switchs enquanto está em uma simulação para evitar bugs.
+
 

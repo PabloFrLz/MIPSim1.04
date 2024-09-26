@@ -65,7 +65,7 @@ public class Main extends Application {
     public static Color color_states_fsm = Color.GREEN; // cor dos estados S0 ao S11 da FSM na barra de estado abaixo dos modulos.
     private static boolean gradiente = false; //habilita um gradiente no terminal quando é energizado
     public static boolean gradientetoStates = false; //habilita um gradiente no terminal quando é energizado
-    private static double speed_terminal = 3.0; //velocidade da energia nos terminais
+    private static double speed_terminal = 1.5; //velocidade da energia nos terminais
     public static int animacao = 1; // controla a animação textual
     public static int end_limit = 128; //quantidade de bytes que serão imprimidos na tela da interface nos segmentos Text, Dynamic, e Global. a quantidade de palavras é dado por:   end_limit / 4 
     public static int font_text = InfoPath.TAM_FONTE; //Tamanho da fonte dos textos
@@ -196,7 +196,7 @@ public class Main extends Application {
         // _______________________________ (Cria as opções de Settings) _________________________________
         
         // ------------------------------- ( Cria um Slider - Simulation speed) ------------------------
-        Slider speedSlider = new Slider(0.1, 6.0, 3.0); // velocidades possiveis no intervalo de 0.1 a 6.0, valor inicial 2.0.
+        Slider speedSlider = new Slider(0.1, 6.0, speed_terminal); // velocidades possiveis no intervalo de 0.1 a 6.0, valor inicial está na inicialização de "speed_terminal", que é 1.5.
         speedSlider.setShowTickLabels(true);
         speedSlider.setShowTickMarks(true);
         speedSlider.setMajorTickUnit(0.5);
@@ -268,8 +268,10 @@ public class Main extends Application {
         appearanceItem1.setOnAction(e -> {
             BarraLateral.showNeonFrame(true); //habilita neon view
             BarraLateral.showGoldenFrame(false); //desabilita golden view
+            Terminal.setEfeitoBoxBlur(); //aplica um efeito nos terminais ao carregar.
         });
         appearanceItem2.setOnAction(e -> {
+            if(Terminal.getEfeitoBoxBlur()){ Terminal.setEfeitoBoxBlur(); }
             BarraLateral.showNeonFrame(false);
             BarraLateral.showGoldenFrame(true);
         });
@@ -467,7 +469,7 @@ public class Main extends Application {
 
 
 
-        //_____________________________________________ (Botão step) __________________________________________________________
+        //_____________________________________________ (Botão clock) __________________________________________________________
         // Botão para avançar pelos estados da FSM e datapath das instruções
         clockButton = new Button();
         clockButton.setLayoutX(BACKPLATE_BTN_X+197);
@@ -484,11 +486,15 @@ public class Main extends Application {
             clockButton.setDisable(true); // Desabilita o botão step e stop inicialmente para que o usuario nao pressione enquanto o estado esta em execução.
             stopButton.setDisable(true); 
             infoPath.notShowWaitClock(); //interrompe a mensagem "waiting clock..."
+            BarraLateral.toggleSwitch1.setDisable(true); //desabilita os toggle switchs enquanto está rodando a simulação para evitar bugs. 
+            BarraLateral.toggleSwitch2.setDisable(true);
 
-            if(mips.memoria.NOPFlag){ //instrução NOP - equivalente a pressionar o botão 'stopButton'
+            if(PC.getPC() > Memory.final_instruction){ //instrução NOP - equivalente a pressionar o botão 'stopButton'
                 showAlert(AlertType.WARNING, "Warning Dialog", "NOP instruction (0x00000000)", "The program was be reset."); 
                 resetProgram();
                 mips.memoria.NOPFlag = false;
+                System.out.println("\n *** ("+mips.memoria.final_instruction+") ***");
+                System.out.println("\n *** ("+PC.getPC()+") ***");  
                 System.out.println("\n *** (reset) ***"); 
                 infoPath.showWaitClock(); // mostra a mensagem "waiting clock..." novamente. 
                 clockButton.setDisable(false); //habilita os botoes
@@ -545,7 +551,12 @@ public class Main extends Application {
                 mips.ula.setFlagZero((short) 0); //reset flagzero
                 infoPath.atualizaInfo(52); //reset entradas das portas logicas - as demais entradas já são resetadas no metodo resetaSinais da UC
                 infoPath.atualizaInfo(124);
-                dataPath.FSMStates(0); // executa o data path do estado S0.
+                // executa o data path do estado S0.
+                if(DataPath.enable_parallel){ 
+                    dataPath.FSMStatesParallel(0);
+                } else {
+                    dataPath.FSMStates(0);
+                } 
                 mips.uc.instr = "";
                 Memory.current_instruction.set(counter_current_instruction++); //incrementa o item da listview que representa o segmento TEXT, destacando a instrução atual em execução.
                 

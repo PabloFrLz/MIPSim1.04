@@ -12,6 +12,7 @@ import MIPS.Memory;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -67,13 +68,16 @@ public class BarraLateral {
     //atributos relacionados aos appearances
     private static Group neonFrameGroup;
     private static Group goldenFrameGroup;
-    private static Text TEXTSegment, DYNAMICSegment, GLOBALSegment, textMoldura, textNeonFrame, instructionType, registerSet;
+    private static Text TEXTSegment, DYNAMICSegment, GLOBALSegment, textMoldura, textNeonFrame, instruction, registerSet;
     //demais atributos:
     private static Text instr; //irá conter a instrução atual
     private static Text instr_bin; //irá conter a instrução atual em binario
     private static Text type_instr; //contem o tipo da instrução
+    private static Text type_text;
     private static TextArea TEXTArea;
     private static List<Text> regList;
+    public static ToggleSwitch toggleSwitch1;
+    public static ToggleSwitch toggleSwitch2;
 
 
 
@@ -142,9 +146,9 @@ public class BarraLateral {
 
         // ____________________________________________ (seção da instrução e seu tipo) ________________________________________________
 
-        instructionType = createTitle("Instruction (Type    )", COR_BAR, POS_X_BAR_RIGHT+60, POS_Y_BAR_RIGHT+38, 18, 1, true, "medium"); 
-        //createTitle("Type", COR_BAR, POS_X_BAR_RIGHT+190, POS_Y_BAR_RIGHT+38, 18, null, 1, false); 
-        this.type_instr = createTitle("?", Color.ORANGE, POS_X_BAR_RIGHT+198, POS_Y_BAR_RIGHT+38, 18, 1, false, "medium");  // texto adicional, portanto false.
+        instruction = createTitle("Instruction", COR_BAR, POS_X_BAR_RIGHT+82, POS_Y_BAR_RIGHT+38, 18, 1, true, "medium"); 
+        this.type_text = createTitle("Type:", COR_BAR, POS_X_BAR_RIGHT+190, POS_Y_BAR_RIGHT+75, 12, 1, false, "medium");  // texto adicional, portanto false.
+        this.type_instr = createTitle("?", Color.ORANGE, POS_X_BAR_RIGHT+222, POS_Y_BAR_RIGHT+75, 12, 1, false, "medium"); 
 
         createbackgroundToText(POS_X_BAR_RIGHT+10, POS_Y_BAR_RIGHT+80, DIM_X_INSTR_BAR, DIM_Y_INSTR_BAR, false, null);
         this.instr = createTitle("wait instr...", Color.WHITE, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+102, 18, 1, false, "medium"); // texto da instrução, e.g: add $t0, $t1, $t2
@@ -202,12 +206,12 @@ public class BarraLateral {
 
 
         // _________________________________ (Seção p/ criação de Toggle Switchs) ________________________________________
-        createToggleSwitch("RADIANT TERMINAL", 1830, 925, 1704, 937, Terminal::setEfeitoBoxBlur, Terminal::setEfeitoBoxBlur, false);
-        createToggleSwitch("SHOW DETAILS", 1830, 960, 1730, 973, InfoPath::TextoON, InfoPath::TextoOFF, true);
+        toggleSwitch1 = createToggleSwitch("PARALLEL SIMULATION", 1830, 925, 1694, 937, DataPath::setEnableParallel, DataPath::setEnableParallel, true);
+        toggleSwitch2 = createToggleSwitch("SHOW DETAILS", 1830, 960, 1734, 973, InfoPath::TextoON, InfoPath::TextoOFF, true);
 
 
         // ________________________________ (Criando molduras para agrupar os segmentos de memoria) ________________________________________
-        createNeonFrame(); 
+        createNeonFrame(Color.LIME, Color.GREEN); 
         showNeonFrame(false); //não mostra a appearance secundaria
         
         createGoldenFrame();//Appearance principal
@@ -392,12 +396,12 @@ public class BarraLateral {
         return TEXTreg;
     } 
 
-    public void createToggleSwitch(String nameAction, double layoutX, double layoutY, double layoutTextX, double layoutTextY, Runnable onAction, Runnable offAction, boolean enableSelect){
+    public ToggleSwitch createToggleSwitch(String nameAction, double layoutX, double layoutY, double layoutTextX, double layoutTextY, Runnable onAction, Runnable offAction, boolean enableSelect){
         //switch para habilitar ou nao o texto nos módulos
-        ToggleSwitch toggleSwitch1 = new ToggleSwitch(); 
-        toggleSwitch1.setLayoutX(layoutX);
-        toggleSwitch1.setLayoutY(layoutY);
-        toggleSwitch1.setSelected(enableSelect); //parametro 'enableSelect' determina se a chave vai ser iniciada em 'ON' ou em 'OFF'
+        ToggleSwitch toggleSwitch = new ToggleSwitch(); 
+        toggleSwitch.setLayoutX(layoutX);
+        toggleSwitch.setLayoutY(layoutY);
+        toggleSwitch.setSelected(enableSelect); //parametro 'enableSelect' determina se a chave vai ser iniciada em 'ON' ou em 'OFF'
 
         Text text1 = new Text(layoutTextX, layoutTextY, nameAction);
         text1.setFont(new Font(11));
@@ -405,7 +409,7 @@ public class BarraLateral {
         statusLabel1.setLayoutX(1810); 
         statusLabel1.setLayoutY(layoutTextY-5); 
         statusLabel1.setFont(new Font(9));
-        toggleSwitch1.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 statusLabel1.setText("ON");
                 statusLabel1.setTextFill(Color.GREEN);
@@ -419,8 +423,14 @@ public class BarraLateral {
             }
         });
 
-        rootLayout.getChildren().addAll(toggleSwitch1, statusLabel1, text1);
+        rootLayout.getChildren().addAll(toggleSwitch, statusLabel1, text1);
 
+        Platform.runLater(() -> {
+            statusLabel1.setText("ON");
+            statusLabel1.setTextFill(Color.GREEN);
+        });
+        
+        return toggleSwitch;
     }
 
     public void setInstructionBIN(String instruction){
@@ -486,7 +496,7 @@ public class BarraLateral {
 
     public TextArea getTEXTArea(){ return this.TEXTArea;}
 
-    public void createNeonFrame(){ //moldura principal para destacar as memorias.
+    public void createNeonFrame(Color primary, Color secondary){ //moldura principal para destacar as memorias.
         neonFrameGroup = new Group(); // Contêiner para agrupar todos os elementos
 
         StackPane stackPaneNeonFrame = new StackPane();
@@ -500,7 +510,7 @@ public class BarraLateral {
 
          // Criação do retângulo maior para desfoque
         Rectangle blurFrame = new Rectangle(14, 286, 252, 700);
-        blurFrame.setStroke(Color.LIME);
+        blurFrame.setStroke(primary);
         blurFrame.setFill(null);
         //blurFrame.setFill(Color.TRANSPARENT); // Interior transparente
         blurFrame.setStrokeWidth(10);
@@ -509,7 +519,7 @@ public class BarraLateral {
 
         // Criação da moldura neon com bordas arredondadas
         Rectangle neonFrame = new Rectangle(14, 286, 252, 700);
-        neonFrame.setStroke(Color.GREEN);
+        neonFrame.setStroke(secondary);
         neonFrame.setFill(null);
         neonFrame.setStrokeWidth(10);
         neonFrame.setArcWidth(50); // Bordas arredondadas
@@ -543,6 +553,7 @@ public class BarraLateral {
 
 
     public void createGoldenFrame(){
+        //createNeonFrame(Color.YELLOWGREEN, Color.YELLOW);
         goldenFrameGroup = new Group();
 
         Image imageLabel2 = new Image("file:recursos/moldura-memoria.png");
@@ -554,6 +565,7 @@ public class BarraLateral {
 
         goldenFrameGroup.getChildren().addAll(imageViewMoldura);
         rootLayout.getChildren().add(goldenFrameGroup);
+        //showNeonFrame(true);
     }
 
 
@@ -569,8 +581,10 @@ public class BarraLateral {
             GLOBALSegment.setStyle(estilo);
             textMoldura.setStyle(estilo);
             textNeonFrame.setStyle(estilo);
-            instructionType.setStyle(estilo);
+            instruction.setStyle(estilo);
             registerSet.setStyle(estilo);
+            type_text.setStyle(estilo);
+
 
             estilo = "-fx-stroke: none; -fx-fill: limegreen; -fx-font-family: 'Inria Sans'; -fx-font-weight: lighter;  ";
             for (Text a : regList){ //altera a cor dos registradores
@@ -594,8 +608,9 @@ public class BarraLateral {
             GLOBALSegment.setStyle(estilo);
             textMoldura.setStyle(estilo);
             textNeonFrame.setStyle(estilo);
-            instructionType.setStyle(estilo);
+            instruction.setStyle(estilo);
             registerSet.setStyle(estilo);
+            type_text.setStyle(estilo);
 
             estilo = "-fx-stroke: none; -fx-fill: rgb(255, 215, 0); -fx-font-family: 'Inria Sans'; -fx-font-weight: lighter;";
             for (Text a : regList){
