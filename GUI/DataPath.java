@@ -507,11 +507,11 @@ public class DataPath{
             a40.setDelay(2.0);
             t20.setDelay(2.0);
             if(enableFlagZero){ 
-                terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16,a50,a51,a52);
-                terminaisList2 = Arrays.asList(a28,a29,a30,t17,t18,a41,a42,a43,a44);
+                terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16,a44,a50,a51,a52);
+                terminaisList2 = Arrays.asList(a28,a29,a30,t17,t18,a41,a42,a43);
             }else{
-                terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16);
-                terminaisList2 = Arrays.asList(a28,a29,a30,t17,t18,a41,a42,a43,a44);
+                terminaisList = Arrays.asList(a27,t19,t20,a40,t15,t16,a44);
+                terminaisList2 = Arrays.asList(a28,a29,a30,t17,t18,a41,a42,a43);
             }
             
         
