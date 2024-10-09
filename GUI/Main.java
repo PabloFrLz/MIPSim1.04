@@ -514,24 +514,34 @@ public class Main extends Application {
             //executa o caminho de dados configurado para a instrução especifica na interface grafica. Digamos que seria o front-end da aplicação
             if(mips.uc.instr != ""){
                 if(mips.uc.instr.equals("Tipo-R")){
+                    BarraLateral.typeR_binary_activate();
                     dataPath.tipoR(mips.ciclos_clock); //o caminho para as instruções do tipo-R são iguais. Pelo menos para as instruções do tipo_R iniciais, como add,sub,and,or,slt. Para "jr" é diferente.
                 }else if(mips.uc.instr.equals("lw")){
+                    BarraLateral.typeI_binary_activate();
                     dataPath.lw(mips.ciclos_clock);
                 }else if(mips.uc.instr.equals("sw")){
+                    BarraLateral.typeI_binary_activate();
                     dataPath.sw(mips.ciclos_clock);
                 }else if(mips.uc.instr.equals("addi")){ 
+                    BarraLateral.typeI_binary_activate();
                     dataPath.addi(mips.ciclos_clock);
                 }else if(mips.uc.instr.equals("beq")){
+                    BarraLateral.typeI_binary_activate();
                     dataPath.beq(mips.ciclos_clock);
                 }else if(mips.uc.instr.equals("j")){
+                    BarraLateral.typeJ_binary_activate();
                     dataPath.j(mips.ciclos_clock);
                 }else if(mips.uc.instr.equals("jal")){
+                    BarraLateral.typeJ_binary_activate();
                     dataPath.jal(mips.ciclos_clock);
                 }else if(mips.uc.instr.equals("jr")){ 
+                    BarraLateral.typeR_binary_activate();
                     dataPath.jr(mips.ciclos_clock);
                 }else if(mips.uc.instr.equals("lb")){ 
+                    BarraLateral.typeI_binary_activate();
                     dataPath.lw(mips.ciclos_clock); // lb possui mesmo caminho da instrução lw
                 }else if(mips.uc.instr.equals("sb")){ 
+                    BarraLateral.typeI_binary_activate();
                     dataPath.sw(mips.ciclos_clock); // sb possui mesmo caminho da instrução sw
                 }/*else if(mips.uc.instr.equals("nome da nova instrução")){ 
                     dataPath.sw(mips.ciclos_clock); // inserir o metodo de DataPath.java que executa a animação para esta nova instrução.
@@ -548,6 +558,7 @@ public class Main extends Application {
                 barraLateral.setInstruction("wait instr..."); 
                 barraLateral.setInstructionBIN("00000000000000000000000000000000");
                 barraLateral.setTypeInstr("?");
+                BarraLateral.binary_deactivate();
                 mips.ula.setFlagZero((short) 0); //reset flagzero
                 infoPath.atualizaInfo(52); //reset entradas das portas logicas - as demais entradas já são resetadas no metodo resetaSinais da UC
                 infoPath.atualizaInfo(124);
@@ -658,5 +669,7 @@ public class Main extends Application {
 
         Memory.current_instruction.set(0);
         counter_current_instruction = 0;
+
+        BarraLateral.binary_deactivate();
     }
 }

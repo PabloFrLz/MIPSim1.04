@@ -42,6 +42,11 @@ public class Memory implements ClockListener{
     public boolean NOPFlag = false;
     public static int final_instruction;
     public static IntegerProperty current_instruction = new SimpleIntegerProperty(0); //variavel que contabiliza quantidade de instruções e dados carregados.
+
+    public static String typeR_binary_infos[];
+    public static String typeI_binary_infos[];
+    public static String typeJ_binary_infos[];
+    
     
     
     
@@ -70,6 +75,9 @@ public class Memory implements ClockListener{
         this.endereco_inicial_RESERVED_2 = convertHexToDecimal("003FFFB4");
         this.endereco_final_RESERVED_2 = convertHexToDecimal("00800000");
 
+        typeR_binary_infos = new String[6];
+        typeI_binary_infos = new String[4];
+        typeJ_binary_infos = new String[2];
 
     }
     
@@ -190,6 +198,13 @@ public class Memory implements ClockListener{
                     rs = Memory.this.registerFile.registrador_num(rs);
                     rd = "00000";
                     rt = "00000";
+                    typeR_binary_infos[0] = op;
+                    typeR_binary_infos[1] = rs;
+                    typeR_binary_infos[2] = rt;
+                    typeR_binary_infos[3] = rd;
+                    typeR_binary_infos[4] = shamt;
+                    typeR_binary_infos[5] = funct;
+
                     return op+rs+rt+rd+shamt+funct; 
                 }/*else if(operacao.equals("insira o nome da instrução")){
                     funct = "000000"; // insira o funct da instrução em binario 
@@ -211,6 +226,13 @@ public class Memory implements ClockListener{
                 rt = Memory.this.registerFile.registrador_num(rt);
                 rd = Memory.this.registerFile.registrador_num(rd);
                 rs = Memory.this.registerFile.registrador_num(rs);
+
+                typeR_binary_infos[0] = op; // codigo para mostrar os valores nos campos da instrução na interface grafica
+                typeR_binary_infos[1] = rs;
+                typeR_binary_infos[2] = rt;
+                typeR_binary_infos[3] = rd;
+                typeR_binary_infos[4] = shamt;
+                typeR_binary_infos[5] = funct;
 
                 return op+rs+rt+rd+shamt+funct; //campos de uma instrução tipo-R em ordem
 
@@ -261,6 +283,11 @@ public class Memory implements ClockListener{
                 rt = Memory.this.registerFile.registrador_num(rt);
                 rs = Memory.this.registerFile.registrador_num(rs);
 
+                typeI_binary_infos[0] = op; // codigo para mostrar os valores nos campos da instrução na interface grafica
+                typeI_binary_infos[1] = rs;
+                typeI_binary_infos[2] = rt;
+                typeI_binary_infos[3] = imm;
+
                 return op+rs+rt+imm; //campos de uma instrução tipo-I em ordem
 
 
@@ -285,6 +312,9 @@ public class Memory implements ClockListener{
                 // 0000 "0000 0100 0000 0000 0000 1010 00" 00 = "0x00100028" (totalizando 26 bits)
                 Addr = Addr.substring(4);// remove os primeiros 4 bits
                 Addr = Addr.substring(0, Addr.length() - 2); //remove os 2 últimos bits
+
+                typeJ_binary_infos[0] = op; // codigo para mostrar os valores nos campos da instrução na interface grafica
+                typeJ_binary_infos[1] = Addr;
 
                 return op+Addr; //campos de uma instrução tipo-J em ordem
 

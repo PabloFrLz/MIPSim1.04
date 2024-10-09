@@ -27,4 +27,5 @@ NOTAS VER. 1.04:
 
     10 - Desativação dos toggle switchs enquanto está em uma simulação para evitar bugs.
 
+    11 - Inserido uma estrutura que mostra a instrução em código de máquina e seus campos (opcode,funct,shamt,imm,Addr,rs,rt,rd).
 

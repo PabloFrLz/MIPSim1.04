@@ -78,14 +78,15 @@ public class BarraLateral {
     private static List<Text> regList;
     public static ToggleSwitch toggleSwitch1;
     public static ToggleSwitch toggleSwitch2;
+    public static Line line1, line2, line3, line4, line5, line6;
+    public static Text opcode, rs, rt, rd, shamt, funct, imm, Addr;
+    public static Text text_opcode, text_rs, text_rt, text_rd, text_shamt, text_funct, text_imm, text_Addr;
 
 
 
     public BarraLateral(Pane rootLayout) {
 
         this.rootLayout = rootLayout;
-
-        
 
         // #####################################- (Definindo a Barra Lateral esquerda) -########################################
         Image imageLabel = new Image("file:recursos/background-lateral.png");
@@ -150,17 +151,20 @@ public class BarraLateral {
         this.type_text = createTitle("Type:", COR_BAR, POS_X_BAR_RIGHT+190, POS_Y_BAR_RIGHT+75, 12, 1, false, "medium");  // texto adicional, portanto false.
         this.type_instr = createTitle("?", Color.ORANGE, POS_X_BAR_RIGHT+222, POS_Y_BAR_RIGHT+75, 12, 1, false, "medium"); 
 
-        createbackgroundToText(POS_X_BAR_RIGHT+10, POS_Y_BAR_RIGHT+80, DIM_X_INSTR_BAR, DIM_Y_INSTR_BAR, false, null);
-        this.instr = createTitle("wait instr...", Color.WHITE, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+102, 18, 1, false, "medium"); // texto da instrução, e.g: add $t0, $t1, $t2
-        this.instr_bin = createTitle("00000000000000000000000000000000", Color.GRAY, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+117, 12, 1, false, "medium");
+        createbackgroundToText(POS_X_BAR_RIGHT+10, POS_Y_BAR_RIGHT+80, DIM_X_INSTR_BAR, DIM_Y_INSTR_BAR+50, false, null);
+        this.instr = createTitle("wait instr...", Color.WHITE, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+104, 18, 1, false, "medium"); // texto da instrução, e.g: add $t0, $t1, $t2
+        this.instr_bin = createTitle("00000000000000000000000000000000", Color.GRAY, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+119, 12, 1, false, "medium");
 
         this.instr.getStyleClass().add("text-normal");
         this.instr_bin.getStyleClass().add("text-normal-2");
         
+        // campos da instrução, como opcode, funct, imm, etc..
+        init_binary_fields(1650, 150, 1, Color.GRAY, Color.WHITE);
+
         // ____________________________________________ (seção do conjunto dos 32 registradores) ________________________________________________
         
-        registerSet = createTitle("Register Set", COR_BAR, POS_X_BAR_RIGHT+80, POS_Y_BAR_RIGHT+190, 18, 1, true, "medium"); 
-        createbackgroundToText(POS_X_BAR_RIGHT+10, POS_Y_BAR_RIGHT+230, DIM_X_REGSET_BAR, DIM_Y_REGSET_BAR, false, null);
+        registerSet = createTitle("Register Set", COR_BAR, POS_X_BAR_RIGHT+80, POS_Y_BAR_RIGHT+230, 18, 1, true, "medium"); 
+        createbackgroundToText(POS_X_BAR_RIGHT+10, POS_Y_BAR_RIGHT+270, DIM_X_REGSET_BAR, DIM_Y_REGSET_BAR, false, null);
         
 
         this.registradores = new ArrayList<>();
@@ -170,39 +174,39 @@ public class BarraLateral {
         // --------------------------- (criando as boxes para cada registrador e adicionando em uma linked list para fazer modificações futuras) -----------------------------
         regList = new ArrayList<Text>();
         // Fileira 1:
-        regList.add(createBoxRegister(0, COR_BAR, 30, 250));
-        regList.add(createBoxRegister(1, COR_BAR, 30, 280));
-        regList.add(createBoxRegister(2, COR_BAR, 30, 310));
-        regList.add(createBoxRegister(3, COR_BAR, 30, 340));
-        regList.add(createBoxRegister(4, COR_BAR, 30, 370));
-        regList.add(createBoxRegister(5, COR_BAR, 30, 400));
-        regList.add(createBoxRegister(6, COR_BAR, 30, 430));
-        regList.add(createBoxRegister(7, COR_BAR, 30, 460));
-        regList.add(createBoxRegister(8, COR_BAR, 30, 490));
-        regList.add(createBoxRegister(9, COR_BAR, 30, 520));
-        regList.add(createBoxRegister(10, COR_BAR, 30, 550));
-        regList.add(createBoxRegister(11, COR_BAR, 30, 580));
-        regList.add(createBoxRegister(12, COR_BAR, 30, 610));
-        regList.add(createBoxRegister(13, COR_BAR, 30, 640));
-        regList.add(createBoxRegister(14, COR_BAR, 30, 670));
-        regList.add(createBoxRegister(15, COR_BAR, 30, 700));
+        regList.add(createBoxRegister(0, COR_BAR, 30, 290));
+        regList.add(createBoxRegister(1, COR_BAR, 30, 320));
+        regList.add(createBoxRegister(2, COR_BAR, 30, 350));
+        regList.add(createBoxRegister(3, COR_BAR, 30, 380));
+        regList.add(createBoxRegister(4, COR_BAR, 30, 410));
+        regList.add(createBoxRegister(5, COR_BAR, 30, 440));
+        regList.add(createBoxRegister(6, COR_BAR, 30, 470));
+        regList.add(createBoxRegister(7, COR_BAR, 30, 500));
+        regList.add(createBoxRegister(8, COR_BAR, 30, 530));
+        regList.add(createBoxRegister(9, COR_BAR, 30, 560));
+        regList.add(createBoxRegister(10, COR_BAR, 30, 590));
+        regList.add(createBoxRegister(11, COR_BAR, 30, 620));
+        regList.add(createBoxRegister(12, COR_BAR, 30, 650));
+        regList.add(createBoxRegister(13, COR_BAR, 30, 680));
+        regList.add(createBoxRegister(14, COR_BAR, 30, 710));
+        regList.add(createBoxRegister(15, COR_BAR, 30, 740));
         //fileira 2:
-        regList.add(createBoxRegister(16, COR_BAR, 130, 250));
-        regList.add(createBoxRegister(17, COR_BAR, 130, 280));
-        regList.add(createBoxRegister(18, COR_BAR, 130, 310));
-        regList.add(createBoxRegister(19, COR_BAR, 130, 340));
-        regList.add(createBoxRegister(20, COR_BAR, 130, 370));
-        regList.add(createBoxRegister(21, COR_BAR, 130, 400));
-        regList.add(createBoxRegister(22, COR_BAR, 130, 430));
-        regList.add(createBoxRegister(23, COR_BAR, 130, 460));
-        regList.add(createBoxRegister(24, COR_BAR, 130, 490));
-        regList.add(createBoxRegister(25, COR_BAR, 130, 520));
-        regList.add(createBoxRegister(26, COR_BAR, 130, 550));
-        regList.add(createBoxRegister(27, COR_BAR, 130, 580));
-        regList.add(createBoxRegister(28, COR_BAR, 130, 610));
-        regList.add(createBoxRegister(29, COR_BAR, 130, 640));
-        regList.add(createBoxRegister(30, COR_BAR, 130, 670));
-        regList.add(createBoxRegister(31, COR_BAR, 130, 700));
+        regList.add(createBoxRegister(16, COR_BAR, 130, 290));
+        regList.add(createBoxRegister(17, COR_BAR, 130, 320));
+        regList.add(createBoxRegister(18, COR_BAR, 130, 350));
+        regList.add(createBoxRegister(19, COR_BAR, 130, 380));
+        regList.add(createBoxRegister(20, COR_BAR, 130, 410));
+        regList.add(createBoxRegister(21, COR_BAR, 130, 440));
+        regList.add(createBoxRegister(22, COR_BAR, 130, 470));
+        regList.add(createBoxRegister(23, COR_BAR, 130, 500));
+        regList.add(createBoxRegister(24, COR_BAR, 130, 530));
+        regList.add(createBoxRegister(25, COR_BAR, 130, 560));
+        regList.add(createBoxRegister(26, COR_BAR, 130, 590));
+        regList.add(createBoxRegister(27, COR_BAR, 130, 620));
+        regList.add(createBoxRegister(28, COR_BAR, 130, 650));
+        regList.add(createBoxRegister(29, COR_BAR, 130, 680));
+        regList.add(createBoxRegister(30, COR_BAR, 130, 710));
+        regList.add(createBoxRegister(31, COR_BAR, 130, 740));
 
 
         // _________________________________ (Seção p/ criação de Toggle Switchs) ________________________________________
@@ -620,6 +624,262 @@ public class BarraLateral {
             type_instr.setStroke(Color.ORANGERED);
         }
     }
+
+    public void init_binary_fields(int layoutX, int layoutY, double diametro_linha, Color cor_linha, Color cor_texto){
+
+        opcode = new Text();
+        opcode.setLayoutX(layoutX+10);
+        opcode.setLayoutY(layoutY+20);
+        opcode.setFont(new Font(10));
+        opcode.setStroke(null);
+
+        rs = new Text();
+        rs.setLayoutX(layoutX+56);
+        rs.setLayoutY(layoutY+20);
+        rs.setFont(new Font(10));
+        rs.setStroke(null);
+
+        rt = new Text();
+        rt.setLayoutX(layoutX+90);
+        rt.setLayoutY(layoutY+20);
+        rt.setFont(new Font(10));
+        rt.setStroke(null);
+
+        rd = new Text();
+        rd.setLayoutX(layoutX+126);
+        rd.setLayoutY(layoutY+20);
+        rd.setFont(new Font(10));
+        rd.setStroke(null);
+
+        shamt = new Text();
+        shamt.setLayoutX(layoutX+163);
+        shamt.setLayoutY(layoutY+20);
+        shamt.setFont(new Font(10));
+        shamt.setStroke(null);
+
+        funct = new Text();
+        funct.setLayoutX(layoutX+201);
+        funct.setLayoutY(layoutY+20);
+        funct.setFont(new Font(10));
+        funct.setStroke(null);
+
+        imm = new Text();
+        imm.setLayoutX(layoutX+130);
+        imm.setLayoutY(layoutY+20);
+        imm.setFont(new Font(10));
+        imm.setStroke(null);
+
+        Addr = new Text();
+        Addr.setLayoutX(layoutX+69);
+        Addr.setLayoutY(layoutY+20);
+        Addr.setFont(new Font(10));
+        Addr.setStroke(null);
+
+        //____________________________________________________________________________________
+
+        text_opcode = new Text("OPCODE");
+        text_opcode.setLayoutX(layoutX+5);
+        text_opcode.setLayoutY(layoutY);
+        text_opcode.setFont(new Font(11));
+        text_opcode.setStroke(null);
+
+        text_rs = new Text("  RS  ");
+        text_rs.setLayoutX(layoutX+57);
+        text_rs.setLayoutY(layoutY);
+        text_rs.setFont(new Font(11));
+        text_rs.setStroke(null);
+
+        text_rt = new Text("  RT  ");
+        text_rt.setLayoutX(layoutX+92);
+        text_rt.setLayoutY(layoutY);
+        text_rt.setFont(new Font(11));
+        text_rt.setStroke(null);
+
+        text_rd = new Text("  RD  ");
+        text_rd.setLayoutX(layoutX+126);
+        text_rd.setLayoutY(layoutY);
+        text_rd.setFont(new Font(11));
+        text_rd.setStroke(null);
+
+        text_shamt = new Text("SHAMT");
+        text_shamt.setLayoutX(layoutX+159);
+        text_shamt.setLayoutY(layoutY);
+        text_shamt.setFont(new Font(11));
+        text_shamt.setStroke(null);
+
+        text_funct = new Text("FUNCT");
+        text_funct.setLayoutX(layoutX+200);
+        text_funct.setLayoutY(layoutY);
+        text_funct.setFont(new Font(11));
+        text_funct.setStroke(null);
+
+        text_imm = new Text("IMM");
+        text_imm.setLayoutX(layoutX+159);
+        text_imm.setLayoutY(layoutY);
+        text_imm.setFont(new Font(11));
+        text_imm.setStroke(null);
+
+        text_Addr = new Text("  ADDR  ");
+        text_Addr.setLayoutX(layoutX+126);
+        text_Addr.setLayoutY(layoutY);
+        text_Addr.setFont(new Font(11));
+        text_Addr.setStroke(null);
+        
+        //____________________________________________________________________________________
+
+        line1 = new Line(layoutX+52, layoutY-10, layoutX+52, layoutY+21);
+        line2 = new Line(layoutX+86, layoutY-10, layoutX+86, layoutY+21);
+        line3 = new Line(layoutX+121, layoutY-10, layoutX+121, layoutY+21);
+        line4 = new Line(layoutX+156, layoutY-10, layoutX+156, layoutY+21);
+        line5 = new Line(layoutX+197, layoutY-10, layoutX+197, layoutY+21);
+        line6 = new Line(layoutX+5, layoutY-12, layoutX+231, layoutY-12);
+
+        line1.setStrokeWidth(diametro_linha);
+        line2.setStrokeWidth(diametro_linha);
+        line3.setStrokeWidth(diametro_linha);
+        line4.setStrokeWidth(diametro_linha);
+        line5.setStrokeWidth(diametro_linha);
+        line6.setStrokeWidth(diametro_linha);
+
+        line1.setStroke(cor_linha);
+        line2.setStroke(cor_linha);
+        line3.setStroke(cor_linha);
+        line4.setStroke(cor_linha);
+        line5.setStroke(cor_linha);
+        line6.setStroke(cor_linha);
+
+        rootLayout.getChildren().addAll(opcode,rs,rt,rd,shamt,funct,line1,line2,line3,line4,line5,text_opcode,text_rs,text_rt,text_rd,text_shamt,text_funct,line6,imm,text_imm, Addr, text_Addr);
+
+        opcode.setVisible(false);
+        rs.setVisible(false);
+        rt.setVisible(false);
+        rd.setVisible(false);
+        shamt.setVisible(false);
+        funct.setVisible(false);
+        imm.setVisible(false);
+        Addr.setVisible(false);
+
+        line1.setVisible(false);
+        line2.setVisible(false);
+        line3.setVisible(false);
+        line4.setVisible(false);
+        line5.setVisible(false);
+        line6.setVisible(false);
+
+        text_opcode.setVisible(false);
+        text_rs.setVisible(false);
+        text_rt.setVisible(false);
+        text_rd.setVisible(false);
+        text_shamt.setVisible(false);
+        text_funct.setVisible(false);
+        text_imm.setVisible(false);
+        text_Addr.setVisible(false);
+
+    }
+
+
+    public static void binary_deactivate(){ //usado para desativar todas as informações graficas relativas aos campos da instrução
+        opcode.setVisible(false);
+        rs.setVisible(false);
+        rt.setVisible(false);
+        rd.setVisible(false);
+        shamt.setVisible(false);
+        funct.setVisible(false);
+        imm.setVisible(false);
+        Addr.setVisible(false);
+
+        line1.setVisible(false);
+        line2.setVisible(false);
+        line3.setVisible(false);
+        line4.setVisible(false);
+        line5.setVisible(false);
+        line6.setVisible(false);
+
+        text_opcode.setVisible(false);
+        text_rs.setVisible(false);
+        text_rt.setVisible(false);
+        text_rd.setVisible(false);
+        text_shamt.setVisible(false);
+        text_funct.setVisible(false);
+        text_imm.setVisible(false);
+        text_Addr.setVisible(false);
+    }
+
+    public static void typeR_binary_activate(){ // ativa campos da instrução tipo R
+        //desativa todos
+        binary_deactivate(); 
+        //atualiza com as informações binarias
+        opcode.setText(Memory.typeR_binary_infos[0]);
+        rs.setText(Memory.typeR_binary_infos[1]);
+        rt.setText(Memory.typeR_binary_infos[2]);
+        rd.setText(Memory.typeR_binary_infos[3]);
+        shamt.setText(Memory.typeR_binary_infos[4]);
+        funct.setText(Memory.typeR_binary_infos[5]);
+        //ativa graficamente
+        opcode.setVisible(true);
+        rs.setVisible(true);
+        rt.setVisible(true);
+        rd.setVisible(true);
+        shamt.setVisible(true);
+        funct.setVisible(true);
+
+        line1.setVisible(true);
+        line2.setVisible(true);
+        line3.setVisible(true);
+        line4.setVisible(true);
+        line5.setVisible(true);
+        line6.setVisible(true);
+
+        text_opcode.setVisible(true);
+        text_rs.setVisible(true);
+        text_rt.setVisible(true);
+        text_rd.setVisible(true);
+        text_shamt.setVisible(true);
+        text_funct.setVisible(true);
+    }
+
+    public static void typeI_binary_activate(){ // ativa campos da instrução tipo I
+        //desativa todos
+        binary_deactivate(); 
+        //atualiza com as informações binarias
+        opcode.setText(Memory.typeI_binary_infos[0]);
+        rs.setText(Memory.typeI_binary_infos[1]);
+        rt.setText(Memory.typeI_binary_infos[2]);
+        imm.setText(Memory.typeI_binary_infos[3]);
+        //ativa graficamente
+        opcode.setVisible(true);
+        rs.setVisible(true);
+        rt.setVisible(true);
+        imm.setVisible(true);
+
+        line1.setVisible(true);
+        line2.setVisible(true);
+        line3.setVisible(true);
+        line6.setVisible(true);
+
+        text_opcode.setVisible(true);
+        text_rs.setVisible(true);
+        text_rt.setVisible(true);
+        text_imm.setVisible(true);
+    }
+
+    public static void typeJ_binary_activate(){ // ativa campos da instrução tipo J
+        //desativa todos
+        binary_deactivate(); 
+        //atualiza com as informações binarias
+        opcode.setText(Memory.typeJ_binary_infos[0]);
+        Addr.setText(Memory.typeJ_binary_infos[1]);
+        //ativa graficamente
+        opcode.setVisible(true);
+        Addr.setVisible(true);
+
+        line1.setVisible(true);
+        line6.setVisible(true);
+
+        text_opcode.setVisible(true);
+        text_Addr.setVisible(true);
+    }
+
 }
 
 
