@@ -74,3 +74,9 @@ addi $t1, $0, 2
 add $t2, $t0, $t1
 sub $t3, $t0, $t1
 
+FIBONACCI:
+addi $t1, $0, 1
+add $t2, $t2, $t1
+sub $t1, $t2, $t1
+j 8192
+

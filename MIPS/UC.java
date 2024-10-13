@@ -38,6 +38,7 @@ public class UC implements ClockListener{
     protected Alu_decoder alu_decoder;
     protected BarraLateral barraLateral;
     protected InfoPath infoPath;
+    public static String cycles;
 
     public UC(){
         this.main_controller = new Main_controller();
@@ -80,7 +81,7 @@ public class UC implements ClockListener{
         if( signImm_x4 <= Short.MAX_VALUE && signImm_x4 >= Short.MIN_VALUE){
             return (short) signImm_x4;
         }else{
-            throw new IllegalArgumentException("[UC.java]: desloca_2bits() - ERRO: Valor do campo imediato excedeu os 16 bits ao deslocar - "+ signImm_x4);
+            throw new IllegalArgumentException("[UC.java]: desloca_2bits() - ERRO: Valor do campo imediato excedeu os 16 bits ao deslocar <<2. Valores permitidos de imediato estão entre 8191 e -8192 - "+ signImm_x4);
         }
     }
 
@@ -304,15 +305,18 @@ public class UC implements ClockListener{
                 if(funct.equals("001000")){ //jr
                     fila.add(() -> S13()); //estado proposto para 'jr'
                     instr = "jr";
+                    cycles = "3 cycles";
                 }else{
                     fila.add(() -> S6());
                     fila.add(() -> S7());
                     instr = "Tipo-R";
+                    cycles = "4 cycles";
+
                 }
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 
-                barraLateral.setTypeInstr("R");
+                barraLateral.setTypeInstr("Type-R");
 
             } else if(opcode.equals("100011")){ //lw
                 fila.add(() -> S2());
@@ -321,7 +325,8 @@ public class UC implements ClockListener{
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 instr = "lw";
-                barraLateral.setTypeInstr("I");
+                barraLateral.setTypeInstr("Type-I");
+                cycles = "5 cycles";
 
             } else if(opcode.equals("101011")){ //sw
                 fila.add(() -> S2());
@@ -329,14 +334,17 @@ public class UC implements ClockListener{
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 instr = "sw";
-                barraLateral.setTypeInstr("I");
+                barraLateral.setTypeInstr("Type-I");
+                cycles = "4 cycles";
+                
                 
             } else if(opcode.equals("000100")){ //beq
                 fila.add(() -> S8());
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 instr = "beq";
-                barraLateral.setTypeInstr("I");
+                barraLateral.setTypeInstr("Type-I");
+                cycles = "3 cycles";
                 
             } else if(opcode.equals("001000")){ //addi
                 fila.add(() -> S9());
@@ -344,21 +352,24 @@ public class UC implements ClockListener{
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 instr = "addi";
-                barraLateral.setTypeInstr("I");
+                barraLateral.setTypeInstr("Type-I");
+                cycles = "4 cycles";
                 
             } else if(opcode.equals("000010")){ //j
                 fila.add(() -> S11());
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 instr = "j";
-                barraLateral.setTypeInstr("J");
+                barraLateral.setTypeInstr("Type-J");
+                cycles = "3 cycles";
                 
             } else if(opcode.equals("000011")){ //jal
                 fila.add(() -> S12());
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 instr = "jal";
-                barraLateral.setTypeInstr("J"); 
+                barraLateral.setTypeInstr("Type-J"); 
+                cycles = "3 cycles";
 
             } else if(opcode.equals("100000")){ //lb
                 fila.add(() -> S2());
@@ -367,7 +378,8 @@ public class UC implements ClockListener{
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 instr = "lb";
-                barraLateral.setTypeInstr("I");
+                barraLateral.setTypeInstr("Type-I");
+                cycles = "5 cycles";
 
             } else if(opcode.equals("101000")){ //sb
                 fila.add(() -> S2());
@@ -375,7 +387,8 @@ public class UC implements ClockListener{
                 fila.add(() -> S0());
                 fila.add(() -> S1());
                 instr = "sb";
-                barraLateral.setTypeInstr("I");
+                barraLateral.setTypeInstr("Type-I");
+                cycles = "4 cycles";
                 
             }/*else if(opcode.equals("insira o opcode da nova instrução")){ // ..;
                 fila.add(() -> Sn()); // substitua Sn() por um estado válido e, se necessário, insira os demais n estados da instrução. 
@@ -383,7 +396,7 @@ public class UC implements ClockListener{
                 //fila.add(() -> S0()); // apenas descomente e mantenha como está
                 //fila.add(() -> S1()); // apenas descomente e mantenha como está
                 instr = "insira o nome da instrução"; //exemplo "jr", "addi", "sub".
-                barraLateral.setTypeInstr("I"); // insira o tipo da instrução: I, R ou J.
+                barraLateral.setTypeInstr("Type-I"); // insira o tipo da instrução: I, R ou J.
                 
                 NOTA: Se for instrução do Tipo-R, desconsidere este bloco e modifique apenas o campo de interesse em Config_ALUControl()
             }*/

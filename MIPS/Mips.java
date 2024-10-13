@@ -4,6 +4,7 @@ package MIPS;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import GUI.BarraLateral;
 import GUI.DataPath;
 
 public class Mips{
@@ -126,6 +127,7 @@ public class Mips{
         mips.uc.setFunct(mips.instrucaoBIN); //extrai funct de 6 bits 
         if(mips.uc.flagEnableDecoder){ //evita que ocorra a decodificação e identificação da instrução enquanto uma instrução está sendo executada.
             mips.uc.main_controller.decode_opcode(); // decode do main_controller da UC
+            BarraLateral.setCycles(UC.cycles);//mostra na barra lateral direita a instrução atual em binário
         }
 
         // neste ponto a instrução já deve ser identificada.
@@ -137,11 +139,17 @@ public class Mips{
 
         }
 
-        if( !(mips.uc.getOpcode().equals("000000") || mips.uc.getOpcode().equals("000010"))  ){ // não obtem o imediato quando for instruções do Tipo-R e j.
+        if( !(mips.uc.getOpcode().equals("000000") || mips.uc.getOpcode().equals("000010"))  ){ // não obtem o imediato extendido quando for instruções do Tipo-R e a instrução "j Addr".
             //extraindo imm extendido (Sign Extend)
             mips.SignImm = (short) Integer.parseUnsignedInt(mips.instrucaoBIN.substring(16, 32), 2); //o sinal já é extendido dentro da memoria na função extraiImm(), então só preciso extrair o imm
-            // deslocando 2 bits à esquerda:
-            mips.SignImm_x4 = mips.uc.desloca_2bits(mips.SignImm);
+            
+            // quando for as instruções ADDI, LW, SW, LB, SB não pode deslocar por <<2, caso contrário, ao inserir uma instrução como "addi $t0, $t1, 32767" dará um erro já que o imediato máximo para esses casos tem que estar entre 8191 e -8192.
+            if(mips.uc.getOpcode().equals("000100")){ // então permitir apenas quando for instrução BEQ. A instrução J também usa deslocamento, só que está usa outro metodo chamado "desloca_2bits_Addr()" que é chamado mais abaixo no codigo.
+                // Caso insira novas instruções que use deslocamento (<<2) no imediato como a BEQ, favor inserir na condição acima.
+                // deslocando 2 bits à esquerda:
+                mips.SignImm_x4 = mips.uc.desloca_2bits(mips.SignImm);
+                //
+            }
         }
         
         //Register File

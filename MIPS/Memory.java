@@ -3,6 +3,7 @@ package MIPS;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import GUI.BarraLateral;
@@ -43,9 +44,7 @@ public class Memory implements ClockListener{
     public static int final_instruction;
     public static IntegerProperty current_instruction = new SimpleIntegerProperty(0); //variavel que contabiliza quantidade de instruções e dados carregados.
 
-    public static String typeR_binary_infos[];
-    public static String typeI_binary_infos[];
-    public static String typeJ_binary_infos[];
+    public static ArrayList<String[]> binary_infos_list;
     
     
     
@@ -75,9 +74,7 @@ public class Memory implements ClockListener{
         this.endereco_inicial_RESERVED_2 = convertHexToDecimal("003FFFB4");
         this.endereco_final_RESERVED_2 = convertHexToDecimal("00800000");
 
-        typeR_binary_infos = new String[6];
-        typeI_binary_infos = new String[4];
-        typeJ_binary_infos = new String[2];
+        binary_infos_list = new ArrayList<>();
 
     }
     
@@ -111,7 +108,7 @@ public class Memory implements ClockListener{
                     return reg_name;
                 }
             }
-            throw new IllegalArgumentException("[Memory.java]: extrai_reg() - ERRO: Nao foi identificado registradores: ");
+            throw new IllegalArgumentException("[Memory.java]: extrai_reg() - ERRO: Nao foi identificado registradores.");
         }
 
         
@@ -134,6 +131,10 @@ public class Memory implements ClockListener{
             }
     
             int num = Integer.parseInt(imm);
+            if(num < -32768 || num > 32767){ //verifica se o imm está no intervalo permitido para esse campo que é entre -32.768 a 32.767.
+                Main.showAlert(AlertType.ERROR, "ERROR", "Invalid values IMM", "IMM Value is not in the range -32768 to 32767."); 
+                throw new IllegalArgumentException("[Memory.java]: extrai_Imm() - ERRO: IMM Value is not in the range -32768 to 32767: "+num);
+            }
             imm = Integer.toBinaryString(num); //converte para binario já em formato de string
             
             if(num >= 0){ // para numero positivos
@@ -179,6 +180,7 @@ public class Memory implements ClockListener{
                 op = "000000"; //opcode
                 shamt = "00000";
                 funct = "";
+                String[] typeR_binary_infos = new String[6];
 
                 if(operacao.equals("add")){
                     funct = "100000"; 
@@ -198,12 +200,15 @@ public class Memory implements ClockListener{
                     rs = Memory.this.registerFile.registrador_num(rs);
                     rd = "00000";
                     rt = "00000";
+
+                    
                     typeR_binary_infos[0] = op;
                     typeR_binary_infos[1] = rs;
                     typeR_binary_infos[2] = rt;
                     typeR_binary_infos[3] = rd;
                     typeR_binary_infos[4] = shamt;
                     typeR_binary_infos[5] = funct;
+                    binary_infos_list.add(typeR_binary_infos); //adiciona na lista para evitarsobrescrita nos loops seguintes
 
                     return op+rs+rt+rd+shamt+funct; 
                 }/*else if(operacao.equals("insira o nome da instrução")){
@@ -233,6 +238,7 @@ public class Memory implements ClockListener{
                 typeR_binary_infos[3] = rd;
                 typeR_binary_infos[4] = shamt;
                 typeR_binary_infos[5] = funct;
+                binary_infos_list.add(typeR_binary_infos);
 
                 return op+rs+rt+rd+shamt+funct; //campos de uma instrução tipo-R em ordem
 
@@ -246,6 +252,7 @@ public class Memory implements ClockListener{
 
                 op = "";
                 imm = "";
+                String[] typeI_binary_infos = new String[4];
 
                 if(operacao.equals("sw")){
                     op = "101011";
@@ -287,6 +294,7 @@ public class Memory implements ClockListener{
                 typeI_binary_infos[1] = rs;
                 typeI_binary_infos[2] = rt;
                 typeI_binary_infos[3] = imm;
+                binary_infos_list.add(typeI_binary_infos);
 
                 return op+rs+rt+imm; //campos de uma instrução tipo-I em ordem
 
@@ -297,6 +305,8 @@ public class Memory implements ClockListener{
                     /*|| operacao.equals("insira o nome da instrução")*/){ 
 
                 op = "";
+                String[] typeJ_binary_infos = new String[6];
+
                 if(operacao.equals("j")){
                     op = "000010";
                 } else if(operacao.equals("jal")){
@@ -315,6 +325,7 @@ public class Memory implements ClockListener{
 
                 typeJ_binary_infos[0] = op; // codigo para mostrar os valores nos campos da instrução na interface grafica
                 typeJ_binary_infos[1] = Addr;
+                binary_infos_list.add(typeJ_binary_infos);
 
                 return op+Addr; //campos de uma instrução tipo-J em ordem
 
@@ -369,12 +380,6 @@ public class Memory implements ClockListener{
         } // quando é negativo, o metodo toBinaryString() já preenche com 1's à esquerda implicitamente.
 
         this.barraLateral.setInstruction(instructionMap.get(bin));//mostra na barra lateral direita a instrução atual em assembly
-        this.barraLateral.setInstructionBIN(bin);//mostra na barra lateral direita a instrução atual em binário
-
-        /*if ( (PC.getPC() > final_instruction) ){ // condição de parada - NOP instruction
-            NOPFlag = true;
-            this.barraLateral.setInstruction("NOP");
-        }*/
 
         return bin;
     }

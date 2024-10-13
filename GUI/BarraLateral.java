@@ -9,6 +9,7 @@ import java.util.List;
 import org.controlsfx.control.ToggleSwitch;
 
 import MIPS.Memory;
+import MIPS.PC;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -71,9 +72,9 @@ public class BarraLateral {
     private static Text TEXTSegment, DYNAMICSegment, GLOBALSegment, textMoldura, textNeonFrame, instruction, registerSet;
     //demais atributos:
     private static Text instr; //irá conter a instrução atual
-    private static Text instr_bin; //irá conter a instrução atual em binario
+    private static Text cycles; //irá conter a quantidade de ciclos da instrução atual
     private static Text type_instr; //contem o tipo da instrução
-    private static Text type_text;
+    //private static Text type_text;
     private static TextArea TEXTArea;
     private static List<Text> regList;
     public static ToggleSwitch toggleSwitch1;
@@ -81,6 +82,7 @@ public class BarraLateral {
     public static Line line1, line2, line3, line4, line5, line6;
     public static Text opcode, rs, rt, rd, shamt, funct, imm, Addr;
     public static Text text_opcode, text_rs, text_rt, text_rd, text_shamt, text_funct, text_imm, text_Addr;
+    public static int pos;
 
 
 
@@ -148,16 +150,18 @@ public class BarraLateral {
         // ____________________________________________ (seção da instrução e seu tipo) ________________________________________________
 
         instruction = createTitle("Instruction", COR_BAR, POS_X_BAR_RIGHT+82, POS_Y_BAR_RIGHT+38, 18, 1, true, "medium"); 
-        this.type_text = createTitle("Type:", COR_BAR, POS_X_BAR_RIGHT+190, POS_Y_BAR_RIGHT+75, 12, 1, false, "medium");  // texto adicional, portanto false.
-        this.type_instr = createTitle("?", Color.ORANGE, POS_X_BAR_RIGHT+222, POS_Y_BAR_RIGHT+75, 12, 1, false, "medium"); 
-
+        //this.type_text = createTitle("Type:", Color.GRAY, POS_X_BAR_RIGHT+190, POS_Y_BAR_RIGHT+90, 12, 1, false, "medium");  // texto adicional, portanto false.
+        
         createbackgroundToText(POS_X_BAR_RIGHT+10, POS_Y_BAR_RIGHT+80, DIM_X_INSTR_BAR, DIM_Y_INSTR_BAR+50, false, null);
-        this.instr = createTitle("wait instr...", Color.WHITE, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+104, 18, 1, false, "medium"); // texto da instrução, e.g: add $t0, $t1, $t2
-        this.instr_bin = createTitle("00000000000000000000000000000000", Color.GRAY, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+119, 12, 1, false, "medium");
+        this.instr = createTitle("wait instr...", Color.WHITE, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+104, 12, 1, false, "medium"); // texto da instrução, e.g: add $t0, $t1, $t2
+        this.type_instr = createTitle("", Color.GRAY, POS_X_BAR_RIGHT+200, POS_Y_BAR_RIGHT+104, 12, 1, false, "medium"); 
+        this.cycles = createTitle("", Color.GRAY, POS_X_BAR_RIGHT+25, POS_Y_BAR_RIGHT+119, 12, 1, false, "medium"); 
 
         this.instr.getStyleClass().add("text-normal");
-        this.instr_bin.getStyleClass().add("text-normal-2");
-        
+        this.cycles.getStyleClass().add("text-normal-2");
+        this.type_instr.getStyleClass().add("text-normal-2");
+        //this.type_text.getStyleClass().add("text-normal-2");
+
         // campos da instrução, como opcode, funct, imm, etc..
         init_binary_fields(1650, 150, 1, Color.GRAY, Color.WHITE);
 
@@ -389,7 +393,7 @@ public class BarraLateral {
         //this.registradores.get(indexReg).setText("00000000"); //inicializa com 8 digitos hexadecimais
 
         Label backgroundRegister = new Label();
-        backgroundRegister.setGraphic(new ImageView("file:recursos/background_regbox.png")); // o innershadow do css do javafx é muito ruim, então tive que pegar uma imagem com innershadow aplicado do figma.com 
+        backgroundRegister.setGraphic(new ImageView("file:recursos/background_regbox.png")); 
         backgroundRegister.setLayoutX(POS_X_BAR_RIGHT+deslocamentoX);
         backgroundRegister.setLayoutY(POS_Y_BAR_RIGHT+deslocamentoY);
         backgroundRegister.setPrefWidth(DIM_X_REGBOX_BAR); 
@@ -437,8 +441,8 @@ public class BarraLateral {
         return toggleSwitch;
     }
 
-    public void setInstructionBIN(String instruction){
-        this.instr_bin.setText(instruction);
+    public static void setCycles(String ciclos){
+        cycles.setText(ciclos);
     }
 
     public void setInstruction(String instruction){
@@ -587,14 +591,13 @@ public class BarraLateral {
             textNeonFrame.setStyle(estilo);
             instruction.setStyle(estilo);
             registerSet.setStyle(estilo);
-            type_text.setStyle(estilo);
+            //type_text.setStyle(estilo);
 
 
             estilo = "-fx-stroke: none; -fx-fill: limegreen; -fx-font-family: 'Inria Sans'; -fx-font-weight: lighter;  ";
             for (Text a : regList){ //altera a cor dos registradores
                 a.setStyle(estilo);
             }
-            type_instr.setStroke(Color.ORANGE);
         }
 
     }
@@ -614,14 +617,13 @@ public class BarraLateral {
             textNeonFrame.setStyle(estilo);
             instruction.setStyle(estilo);
             registerSet.setStyle(estilo);
-            type_text.setStyle(estilo);
+            //type_text.setStyle(estilo);
 
             estilo = "-fx-stroke: none; -fx-fill: rgb(255, 215, 0); -fx-font-family: 'Inria Sans'; -fx-font-weight: lighter;";
             for (Text a : regList){
                 a.setStyle(estilo);
             }
 
-            type_instr.setStroke(Color.ORANGERED);
         }
     }
 
@@ -682,48 +684,56 @@ public class BarraLateral {
         text_opcode.setLayoutY(layoutY);
         text_opcode.setFont(new Font(11));
         text_opcode.setStroke(null);
+        text_opcode.getStyleClass().add("text-normal-2");
 
         text_rs = new Text("  RS  ");
         text_rs.setLayoutX(layoutX+57);
         text_rs.setLayoutY(layoutY);
         text_rs.setFont(new Font(11));
         text_rs.setStroke(null);
+        text_rs.getStyleClass().add("text-normal-2");
 
         text_rt = new Text("  RT  ");
         text_rt.setLayoutX(layoutX+92);
         text_rt.setLayoutY(layoutY);
         text_rt.setFont(new Font(11));
         text_rt.setStroke(null);
+        text_rt.getStyleClass().add("text-normal-2");
 
         text_rd = new Text("  RD  ");
         text_rd.setLayoutX(layoutX+126);
         text_rd.setLayoutY(layoutY);
         text_rd.setFont(new Font(11));
         text_rd.setStroke(null);
+        text_rd.getStyleClass().add("text-normal-2");
 
         text_shamt = new Text("SHAMT");
         text_shamt.setLayoutX(layoutX+159);
         text_shamt.setLayoutY(layoutY);
         text_shamt.setFont(new Font(11));
         text_shamt.setStroke(null);
+        text_shamt.getStyleClass().add("text-normal-2");
 
         text_funct = new Text("FUNCT");
         text_funct.setLayoutX(layoutX+200);
         text_funct.setLayoutY(layoutY);
         text_funct.setFont(new Font(11));
         text_funct.setStroke(null);
+        text_funct.getStyleClass().add("text-normal-2");
 
         text_imm = new Text("IMM");
         text_imm.setLayoutX(layoutX+159);
         text_imm.setLayoutY(layoutY);
         text_imm.setFont(new Font(11));
         text_imm.setStroke(null);
+        text_imm.getStyleClass().add("text-normal-2");
 
         text_Addr = new Text("  ADDR  ");
         text_Addr.setLayoutX(layoutX+126);
         text_Addr.setLayoutY(layoutY);
         text_Addr.setFont(new Font(11));
         text_Addr.setStroke(null);
+        text_Addr.getStyleClass().add("text-normal-2");
         
         //____________________________________________________________________________________
 
@@ -809,12 +819,16 @@ public class BarraLateral {
         //desativa todos
         binary_deactivate(); 
         //atualiza com as informações binarias
-        opcode.setText(Memory.typeR_binary_infos[0]);
-        rs.setText(Memory.typeR_binary_infos[1]);
-        rt.setText(Memory.typeR_binary_infos[2]);
-        rd.setText(Memory.typeR_binary_infos[3]);
-        shamt.setText(Memory.typeR_binary_infos[4]);
-        funct.setText(Memory.typeR_binary_infos[5]);
+        String[] typeR_binary_infos = null;
+        if (pos < Memory.binary_infos_list.size()) {
+            typeR_binary_infos = Memory.binary_infos_list.get(pos);
+            opcode.setText(typeR_binary_infos[0]);
+            rs.setText(typeR_binary_infos[1]);
+            rt.setText(typeR_binary_infos[2]);
+            rd.setText(typeR_binary_infos[3]);
+            shamt.setText(typeR_binary_infos[4]);
+            funct.setText(typeR_binary_infos[5]);
+        } 
         //ativa graficamente
         opcode.setVisible(true);
         rs.setVisible(true);
@@ -842,10 +856,14 @@ public class BarraLateral {
         //desativa todos
         binary_deactivate(); 
         //atualiza com as informações binarias
-        opcode.setText(Memory.typeI_binary_infos[0]);
-        rs.setText(Memory.typeI_binary_infos[1]);
-        rt.setText(Memory.typeI_binary_infos[2]);
-        imm.setText(Memory.typeI_binary_infos[3]);
+        String[] typeI_binary_infos = null;
+        if (pos < Memory.binary_infos_list.size()) {
+            typeI_binary_infos = Memory.binary_infos_list.get(pos);
+            opcode.setText(typeI_binary_infos[0]);
+            rs.setText(typeI_binary_infos[1]);
+            rt.setText(typeI_binary_infos[2]);
+            imm.setText(typeI_binary_infos[3]);
+        } 
         //ativa graficamente
         opcode.setVisible(true);
         rs.setVisible(true);
@@ -867,8 +885,12 @@ public class BarraLateral {
         //desativa todos
         binary_deactivate(); 
         //atualiza com as informações binarias
-        opcode.setText(Memory.typeJ_binary_infos[0]);
-        Addr.setText(Memory.typeJ_binary_infos[1]);
+        String[] typeJ_binary_infos = null;
+        if (pos < Memory.binary_infos_list.size()) {
+            typeJ_binary_infos = Memory.binary_infos_list.get(pos);
+            opcode.setText(typeJ_binary_infos[0]);
+            Addr.setText(typeJ_binary_infos[1]);
+        } 
         //ativa graficamente
         opcode.setVisible(true);
         Addr.setVisible(true);

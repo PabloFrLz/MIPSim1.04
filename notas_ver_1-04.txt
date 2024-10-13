@@ -29,3 +29,13 @@ NOTAS VER. 1.04:
 
     11 - Inserido uma estrutura que mostra a instrução em código de máquina e seus campos (opcode,funct,shamt,imm,Addr,rs,rt,rd).
 
+    12 - Corrigido um bug onde não permitia um valor de imediato (IMM) fora do intervalo de -8192 a 8191, sendo que era pra permitir
+	 qualquer valor no intervalo de -32.768 a 32.767.
+	
+    13 - Corrigido outro bug que permitia valores de IMM maiores que 32.767 e menores que -32.768. Agora uma mensagem de erro é
+	 gerada informado o valor inválido e uma exceção é lançada.
+
+    14 - inserido a quantidade de ciclos na caixa de informações da instrução em execução. O tipo da instrução foi movido para 
+         dentro da caixa de informações da instrução.
+
+

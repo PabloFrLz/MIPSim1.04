@@ -37,11 +37,11 @@
     <opt>--module-path &quot;C:\javafx-sdk-22.0.1\lib&quot;;&quot;C:\javafx-sdk-22.0.1\lib\controlsfx-11.2.1.jar&quot; --add-modules javafx.controls,javafx.fxml,org.controlsfx.controls -cp &quot;C:\javafx-sdk-22.0.1\lib\jmetro-11.6.16.jar&quot;</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.04.02.00</fileVersion>
+    <fileVersion>1.04.03.00</fileVersion>
     <txtFileVersion>1.04.rc1</txtFileVersion>
     <fileDescription>MIPSim - a multi-cycle processor simulator</fileDescription>
     <copyright>© 2024 UFMT. All rights reserved.</copyright>
-    <productVersion>1.04.02.00</productVersion>
+    <productVersion>1.04.03.00</productVersion>
     <txtProductVersion>1.04.rc1</txtProductVersion>
     <productName>MIPSim</productName>
     <companyName>UFMT</companyName>

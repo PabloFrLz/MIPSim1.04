@@ -556,8 +556,8 @@ public class Main extends Application {
                 dataPath.reset_Terminais_BarraEstados(); //reseta os terminais carregados e os estados ativados.
                 mips.ciclos_clock = 0; //reinicializa a variavel que contabiliza os ciclos de clock.
                 barraLateral.setInstruction("wait instr..."); 
-                barraLateral.setInstructionBIN("00000000000000000000000000000000");
-                barraLateral.setTypeInstr("?");
+                barraLateral.setCycles("");
+                barraLateral.setTypeInstr("");
                 BarraLateral.binary_deactivate();
                 mips.ula.setFlagZero((short) 0); //reset flagzero
                 infoPath.atualizaInfo(52); //reset entradas das portas logicas - as demais entradas já são resetadas no metodo resetaSinais da UC
@@ -570,6 +570,7 @@ public class Main extends Application {
                 } 
                 mips.uc.instr = "";
                 Memory.current_instruction.set(counter_current_instruction++); //incrementa o item da listview que representa o segmento TEXT, destacando a instrução atual em execução.
+                BarraLateral.pos = (PC.getPC() - Memory.endereco_inicial_TEXT) / 4; //identifica a posição da palavra na memoria
                 
             } 
             mips.ciclos_clock++; //incrementa o clock
@@ -651,8 +652,8 @@ public class Main extends Application {
         mips.ciclos_clock = 0;
 
         barraLateral.setInstruction("wait instr...");
-        barraLateral.setInstructionBIN("00000000000000000000000000000000");
-        barraLateral.setTypeInstr("?");
+        barraLateral.setCycles("");
+        barraLateral.setTypeInstr("");
         mips.uc.instr = "";
         mips.ula.setFlagZero((short) 0); 
     
@@ -671,5 +672,6 @@ public class Main extends Application {
         counter_current_instruction = 0;
 
         BarraLateral.binary_deactivate();
+        Memory.binary_infos_list.clear();
     }
 }
