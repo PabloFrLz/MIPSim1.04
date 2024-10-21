@@ -1,0 +1,2 @@
+#!/bin/bash
+java --module-path "/mnt/c/javafx-sdk-22.0.2/lib:/mnt/c/javafx-sdk-22.0.2/lib/controlsfx-11.2.1.jar" --add-modules javafx.controls,javafx.fxml,org.controlsfx.controls -cp "/mnt/c/javafx-sdk-22.0.2/lib/jmetro-11.6.16.jar" -jar MIPSim.jar
