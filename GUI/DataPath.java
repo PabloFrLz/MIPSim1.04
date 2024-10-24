@@ -248,8 +248,8 @@ public class DataPath{
                         
                         // _________________ (trecho que prepara a próxima simulação) ________________________
                         infoPath.showWaitClock(); // mostra a mensagem "waiting clock..." novamente. 
-                        Main.clockButton.setDisable(false); // habilita o botão de clock e stop novamente para ser pressionado.
-                        Main.stopButton.setDisable(false); 
+                        Main.clockButton.setDisable(false); // habilita o botão de clock e reset novamente para ser pressionado.
+                        Main.resetButton.setDisable(false); 
                         BarraLateral.toggleSwitch1.setDisable(false); //habilita os toggle switchs novamente.
                         BarraLateral.toggleSwitch2.setDisable(false);
                         for(StateActive clock : Main.clockActivate){ //desabilita a animação de clock, indicando que houve uma borda de descida e o estado atual está finalizado.

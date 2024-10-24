@@ -58,7 +58,7 @@ public class Main extends Application {
     public static ArrayList<StateActive> stateActive;
     public static ArrayList<StateActive> clockActivate;
     public static Button clockButton;
-    public static Button stopButton;
+    public static Button resetButton;
 
     public static JMetro jMetro;
     private static Color cor_energia = Color.ORANGERED; //cor do terminal quando é energizado. 
@@ -479,17 +479,17 @@ public class Main extends Application {
         clockButton.setGraphic(btn_img_clock); //insere imagem no button
         clockButton.getStyleClass().add("button"); //necessário para adicionar a transparencia em volta do button, igual na imagem original.
         clockButton.setBackground(null);
-        Tooltip tooltipStep = new Tooltip("Clock Button");
-        clockButton.setTooltip(tooltipStep);
+        Tooltip tooltipClock = new Tooltip("Clock Button");
+        clockButton.setTooltip(tooltipClock);
         clockButton.setOnAction(e -> {
 
-            clockButton.setDisable(true); // Desabilita o botão step e stop inicialmente para que o usuario nao pressione enquanto o estado esta em execução.
-            stopButton.setDisable(true); 
+            clockButton.setDisable(true); // Desabilita o botão clock e reset inicialmente para que o usuario nao pressione enquanto o estado esta em execução.
+            resetButton.setDisable(true); 
             infoPath.notShowWaitClock(); //interrompe a mensagem "waiting clock..."
             BarraLateral.toggleSwitch1.setDisable(true); //desabilita os toggle switchs enquanto está rodando a simulação para evitar bugs. 
             BarraLateral.toggleSwitch2.setDisable(true);
 
-            if(PC.getPC() > Memory.final_instruction){ //instrução NOP - equivalente a pressionar o botão 'stopButton'
+            if(PC.getPC() > Memory.final_instruction){ //instrução NOP - equivalente a pressionar o botão 'resetButton'
                 showAlert(AlertType.WARNING, "Warning Dialog", "NOP instruction (0x00000000)", "The program was be reset."); 
                 resetProgram();
                 mips.memoria.NOPFlag = false;
@@ -498,7 +498,7 @@ public class Main extends Application {
                 System.out.println("\n *** (reset) ***"); 
                 infoPath.showWaitClock(); // mostra a mensagem "waiting clock..." novamente. 
                 clockButton.setDisable(false); //habilita os botoes
-                stopButton.setDisable(false); 
+                resetButton.setDisable(false); 
                 return;
             } 
 
@@ -580,19 +580,19 @@ public class Main extends Application {
 
 
 
-        //_____________________________________________ (Botão Stop) __________________________________________________________
+        //_____________________________________________ (Botão reset) __________________________________________________________
         // Botão para desenergizar o terminal1
-        stopButton = new Button();
-        stopButton.setLayoutX(BACKPLATE_BTN_X+307);
-        stopButton.setLayoutY(BACKPLATE_BTN_Y+58);
-        ImageView btn_img_stop = new ImageView(new Image("file:recursos/button-stop.png"));
-        Effects.efeitoLighting("Point",btn_img_stop);
-        stopButton.setGraphic(btn_img_stop); //insere imagem no button
-        stopButton.getStyleClass().add("button-3");
-        stopButton.setBackground(null);
-        Tooltip tooltipStop = new Tooltip("Stop Button");
-        stopButton.setTooltip(tooltipStop);
-        stopButton.setOnAction(e -> {
+        resetButton = new Button();
+        resetButton.setLayoutX(BACKPLATE_BTN_X+307);
+        resetButton.setLayoutY(BACKPLATE_BTN_Y+58);
+        ImageView btn_img_reset = new ImageView(new Image("file:recursos/button-reset.png"));
+        Effects.efeitoLighting("Point",btn_img_reset);
+        resetButton.setGraphic(btn_img_reset); //insere imagem no button
+        resetButton.getStyleClass().add("button-3");
+        resetButton.setBackground(null);
+        Tooltip tooltipreset = new Tooltip("Reset Button");
+        resetButton.setTooltip(tooltipreset);
+        resetButton.setOnAction(e -> {
 
             resetProgram(); //reinicializa do inicio o conjunto de instruções
             
@@ -614,7 +614,7 @@ public class Main extends Application {
     
         // _____________________________ (inserção dos ultimos objetos na GUI) _______________________________
         
-        rootLayout.getChildren().addAll(clockButton, stopButton, loadButton); // botoes de start e stop
+        rootLayout.getChildren().addAll(clockButton, resetButton, loadButton); // botoes de start e reset
 
         //efeitos no rootlayout:
         //Effects.efeitoBloom(rootLayout);

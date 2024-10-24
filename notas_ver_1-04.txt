@@ -38,4 +38,6 @@ NOTAS VER. 1.04:
     14 - inserido a quantidade de ciclos na caixa de informações da instrução em execução. O tipo da instrução foi movido para 
          dentro da caixa de informações da instrução.
 
+    15 - modificação da imagem e nome do Stop Button. Agora ele se chamará Reset Button.
+
 
