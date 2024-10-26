@@ -72,6 +72,17 @@ public class Main extends Application {
     public static int counter_current_instruction=0;
     public static int error;
 
+    public static Image backgroundImage;
+    public static Image backgroundImage2;
+    public static ImageView backgroundView;
+    public static Image baseEstadosImage;
+    public static Image baseEstadosImage2;
+    public static ImageView baseEstadosView;
+    public static Image backplateImage;
+    public static Image backplateImage2;
+    public static ImageView backplateImageView;
+    public static boolean gray_enable = false;
+
     public static boolean getGradiente(){ return gradiente;}
     public static Color getCorEnergia(){ return cor_energia;}
     public static double getSpeedTerminal() { return speed_terminal;}
@@ -86,8 +97,9 @@ public class Main extends Application {
         // _____________________________ (Configuração de imagens de background) _______________________________
 
         //adiciona background
-        Image backgroundImage = new Image("file:recursos/background-6.png");
-        ImageView backgroundView = new ImageView(backgroundImage);
+        backgroundImage = new Image("file:recursos/background-6.png");
+        backgroundImage2 = new Image("file:recursos/white-background.png");
+        backgroundView = new ImageView(backgroundImage);
         backgroundView.setFitWidth(back_x); // largura img
         backgroundView.setFitHeight(back_y); // altura img
         backgroundView.setPreserveRatio(true); 
@@ -106,18 +118,19 @@ public class Main extends Application {
         //Effects.efeitoShadow(modulosMIPSView);
 
         //adiciona bases de estado
-        Image baseEstadosImage2 = new Image("file:recursos/base-estados-3.png");
-        ImageView baseEstadosView2 = new ImageView(baseEstadosImage2);
-        baseEstadosView2.setFitWidth(800); // largura img
-        baseEstadosView2.setFitHeight(80); // altura img
-        baseEstadosView2.setLayoutX(bar_x); // coordenada X no plano
-        baseEstadosView2.setLayoutY(bar_y); // coordenada Y no plano
-        baseEstadosView2.setPreserveRatio(true); 
-        baseEstadosView2.setSmooth(true); 
+        baseEstadosImage = new Image("file:recursos/base-estados-3.png");
+        baseEstadosImage2 = new Image("file:recursos/base-estados-4.png");
+        baseEstadosView = new ImageView(baseEstadosImage);
+        baseEstadosView.setFitWidth(800); // largura img
+        baseEstadosView.setFitHeight(80); // altura img
+        baseEstadosView.setLayoutX(bar_x); // coordenada X no plano
+        baseEstadosView.setLayoutY(bar_y); // coordenada Y no plano
+        baseEstadosView.setPreserveRatio(true); 
+        baseEstadosView.setSmooth(true); 
         //_______________________________________________________________________________________________________
 
 
-
+        
 
 
 
@@ -263,17 +276,28 @@ public class Main extends Application {
 
         // _______________________________ (Cria as opções de Appearance) _________________________________
 
-        MenuItem appearanceItem1 = new MenuItem("Neon view");
-        MenuItem appearanceItem2 = new MenuItem("Golden view");
+        MenuItem appearanceItem1 = new MenuItem("Green view");
+        MenuItem appearanceItem2 = new MenuItem("Yellow view");
+        MenuItem appearanceItem3 = new MenuItem("Gray view");
         appearanceItem1.setOnAction(e -> {
+            if(gray_enable){
+                BarraLateral.showGrayFrame(); //desabilita a appearance Gray View.
+            }
             BarraLateral.showNeonFrame(true); //habilita neon view
             BarraLateral.showGoldenFrame(false); //desabilita golden view
             Terminal.setEfeitoBoxBlur(); //aplica um efeito nos terminais ao carregar.
         });
         appearanceItem2.setOnAction(e -> {
+            if(gray_enable){
+                BarraLateral.showGrayFrame(); //desabilita a appearance Gray View.
+            }
             if(Terminal.getEfeitoBoxBlur()){ Terminal.setEfeitoBoxBlur(); }
             BarraLateral.showNeonFrame(false);
             BarraLateral.showGoldenFrame(true);
+        });
+        appearanceItem3.setOnAction(e -> {
+            if(Terminal.getEfeitoBoxBlur()){ Terminal.setEfeitoBoxBlur(); }
+            BarraLateral.showGrayFrame(); //habilita a appearance Gray View.
         });
 
 
@@ -313,7 +337,7 @@ public class Main extends Application {
         stateColor.getItems().addAll(themeItem7, themeItem8, themeItem9, themeItem10, themeItem11);
         themesMenu.getItems().addAll(terminalColor, stateColor);
         textAnimationMenu.getItems().addAll(animationItem1, animationItem2, animationItem3);
-        appearanceMenu.getItems().addAll(appearanceItem1, appearanceItem2);
+        appearanceMenu.getItems().addAll(appearanceItem1, appearanceItem2, appearanceItem3);
         settingsMenu.getItems().addAll(speedMenuItem, fontMenuItem, memoryMenu, themesMenu, textAnimationMenu, appearanceMenu);
         //appearanceMenu.getItems().addAll(appearanceItem1);
 
@@ -395,7 +419,7 @@ public class Main extends Application {
         // _____________________________ (Configuração dos terminais) _______________________________
         
         dataPath = new DataPath(rootLayout, infoPath, stateActive);
-        rootLayout.getChildren().addAll(modulosMIPSView, baseEstadosView2); // [NOTA]: insere parcialmente os objetos na GUI - demais inserções estarão dentro do metodos ou na seção de inserção no fim do codigo.
+        rootLayout.getChildren().addAll(modulosMIPSView, baseEstadosView); // [NOTA]: insere parcialmente os objetos na GUI - demais inserções estarão dentro do metodos ou na seção de inserção no fim do codigo.
 
         // _____________________________ (Configuração dos valores dentro dos módulos MIPS) _________________________________________
         
@@ -457,7 +481,9 @@ public class Main extends Application {
 
 
         // _________________________________ (Imagem de background dos botões ) ______________________________________________
-        ImageView backplateImageView = new ImageView("file:recursos/backplate_button.png");
+        backplateImage = new Image("file:recursos/backplate_button.png");
+        backplateImage2 = new Image("file:recursos/backplate_button_2.png");
+        backplateImageView = new ImageView(backplateImage);
         backplateImageView.setFitWidth(550); 
         backplateImageView.setFitHeight(150);
 
@@ -674,4 +700,6 @@ public class Main extends Application {
         BarraLateral.binary_deactivate();
         Memory.binary_infos_list.clear();
     }
+
+    
 }

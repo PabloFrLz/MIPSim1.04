@@ -83,6 +83,10 @@ public class BarraLateral {
     public static Text opcode, rs, rt, rd, shamt, funct, imm, Addr;
     public static Text text_opcode, text_rs, text_rt, text_rd, text_shamt, text_funct, text_imm, text_Addr;
     public static int pos;
+    public static ImageView imageViewBarLeft;
+    public static Image imageLabel;
+    public static Image imageLabel2;
+    public static ImageView imageViewBarRight;
 
 
 
@@ -91,8 +95,9 @@ public class BarraLateral {
         this.rootLayout = rootLayout;
 
         // #####################################- (Definindo a Barra Lateral esquerda) -########################################
-        Image imageLabel = new Image("file:recursos/background-lateral.png");
-        ImageView imageViewBarLeft= new ImageView(imageLabel);
+        imageLabel = new Image("file:recursos/background-lateral.png");
+        imageLabel2 = new Image("file:recursos/background-lateral-2.png");
+        imageViewBarLeft = new ImageView(imageLabel);
         imageViewBarLeft.setFitWidth(POS_Y_BAR_LEFT+10); 
         imageViewBarLeft.setFitHeight(Main.back_y);
         imageViewBarLeft.getStyleClass().add("image-view-custom");
@@ -138,7 +143,7 @@ public class BarraLateral {
 
         // ____________________________________________ (imagem de background) ________________________________________________
     
-        ImageView imageViewBarRight = new ImageView(imageLabel);
+        imageViewBarRight = new ImageView(imageLabel);
         imageViewBarRight.setLayoutX(POS_X_BAR_RIGHT);
         imageViewBarRight.setLayoutY(POS_Y_BAR_RIGHT);
         imageViewBarRight.setFitHeight(Main.back_y);
@@ -626,6 +631,25 @@ public class BarraLateral {
 
         }
     }
+
+    public static void showGrayFrame(){
+        if(Main.gray_enable){
+            Main.backgroundView.setImage(Main.backgroundImage);
+            Main.baseEstadosView.setImage(Main.baseEstadosImage);
+            BarraLateral.imageViewBarLeft.setImage(BarraLateral.imageLabel);
+            BarraLateral.imageViewBarRight.setImage(BarraLateral.imageLabel);
+            Main.backplateImageView.setImage(Main.backplateImage);
+            Main.gray_enable = false;
+        } else{
+            Main.backgroundView.setImage(Main.backgroundImage2);
+            Main.baseEstadosView.setImage(Main.baseEstadosImage2);
+            BarraLateral.imageViewBarLeft.setImage(BarraLateral.imageLabel2);
+            BarraLateral.imageViewBarRight.setImage(BarraLateral.imageLabel2);
+            Main.backplateImageView.setImage(Main.backplateImage2);
+            Main.gray_enable = true;
+        }
+    }
+
 
     public void init_binary_fields(int layoutX, int layoutY, double diametro_linha, Color cor_linha, Color cor_texto){
 

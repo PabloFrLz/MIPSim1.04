@@ -35,9 +35,11 @@ NOTAS VER. 1.04:
     13 - Corrigido outro bug que permitia valores de IMM maiores que 32.767 e menores que -32.768. Agora uma mensagem de erro é
 	 gerada informado o valor inválido e uma exceção é lançada.
 
-    14 - inserido a quantidade de ciclos na caixa de informações da instrução em execução. O tipo da instrução foi movido para 
+    14 - Inserido a quantidade de ciclos na caixa de informações da instrução em execução. O tipo da instrução foi movido para 
          dentro da caixa de informações da instrução.
 
-    15 - modificação da imagem e nome do Stop Button. Agora ele se chamará Reset Button.
+    15 - Modificação da imagem e nome do Stop Button. Agora ele se chamará Reset Button.
+
+    16 - Adicionado uma nova appearance "Gray view" e removido a transparência parcialmente das listviews de memória.
 
 

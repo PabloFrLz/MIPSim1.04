@@ -63,7 +63,7 @@
     -fx-border-color: gray; /* Cor da borda */
     -fx-border-width: 1; /* Largura da borda */
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5); /* Sombra */
-    -fx-opacity: 0.2; /* Opacidade */
+    -fx-opacity: 0.5; /* Opacidade */
 }
 
 .list-view-custom .list-cell {
