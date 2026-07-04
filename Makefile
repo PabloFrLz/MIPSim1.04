@@ -1,9 +1,9 @@
 JAVAC=javac
 JAVA=java
 JAR=jar
-JAVAFX_LIB="javafx-sdk-22.0.1\lib"
-CONTROLSFX_JAR="javafx-sdk-22.0.1\lib\controlsfx-11.2.1.jar"
-JMETRO_JAR="javafx-sdk-22.0.1\lib\jmetro-11.6.16.jar"
+JAVAFX_LIB="C:\javafx-sdk-22.0.1\lib"
+CONTROLSFX_JAR="C:\javafx-sdk-22.0.1\lib\controlsfx-11.2.1.jar"
+JMETRO_JAR="C:\javafx-sdk-22.0.1\lib\jmetro-11.6.16.jar"
 MODULES=javafx.controls,javafx.fxml,org.controlsfx.controls
 
 SRC=GUI/*.java MIPS/*.java
